@@ -5,9 +5,7 @@
 
 import os
 
-from sehsucht.plumbing.base import Base
-
-from sehsucht.ui.dialog import Dialog
+from vfxui.dialog import Dialog
 
 # =============================================================================
 class ComplexDialog(Dialog):

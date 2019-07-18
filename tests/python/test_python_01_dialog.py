@@ -9,6 +9,7 @@ import time
 import importlib
 import imp
 
+# DBG
 import sehsucht
 
 import vfxui.dialog as dlg
@@ -27,6 +28,8 @@ class UI_Dialog_Test(TestCase):
     # -------------------------------------------------------------------------
     @classmethod
     def setUpOnce(cls):
+
+        dlg.initLogging(format='')
 
         basepath = os.path.dirname(__file__).replace('\\', '/')
 
@@ -48,6 +51,36 @@ class UI_Dialog_Test(TestCase):
     # -------------------------------------------------------------------------
     def tearDown(self):
         pass
+
+    # -------------------------------------------------------------------------
+    def test01_context(self):
+
+        self.assertEqual(Dialog._context, None)
+        foo = dlg.createDialog()
+        Dialog._context = None
+        self.assertEqual(foo.context, 'python')
+        self.assertEqual(Dialog._context, 'python')
+
+        Dialog._context = None
+        with mock.patch('sys.executable', 'C:/foo/bar/mayabatch.exe'):
+            bar = dlg.createDialog()
+            self.assertEqual(bar.context, 'maya')
+        Dialog._context = None
+
+        Dialog._context = None
+
+        with mock.patch('sys.executable', 'C:/foo/bar/nuke11.3.exe'):
+            with mock.patch.dict('sys.modules',
+                {'nuke' : mock.Mock(
+                            env=mock.Mock(
+                                __getitem__=mock.Mock(
+                                    return_value='studio')))
+                }
+            ):
+                bar = dlg.createDialog()
+                self.assertEqual(bar.context, 'nukestudio')
+
+        Dialog._context = None
 
     # -------------------------------------------------------------------------
     def test02_divider(self):
@@ -290,7 +323,7 @@ class UI_Dialog_Test(TestCase):
         self.assertEqual(dialog.height, 100)
         self.assertEqual(dialog.fixed_size, False)
 
-        self.assertEqual(dlg.Dialog._resolveContext(), dialog.context)
+        self.assertEqual(dlg.Dialog._context, dialog.context)
 
         dialog = None
 

@@ -14,6 +14,7 @@ import os
 import sys
 import time
 import importlib
+import logging
 
 from .pyside import QtCore, QtGui, QtWidgets
 
@@ -21,6 +22,35 @@ from .filebrowser import FileBrowser
 from .imagelabel import ImageLabel
 from .listbox import ListBox
 from .divider import Divider
+
+logger = logging.getLogger('vfxui')
+"""vfxtest logger"""
+
+# -----------------------------------------------------------------------------
+def initLogging(level=logging.INFO,
+                format='%(message)s'):
+    """Initializes the vfxui logger.
+
+    Args:
+        level            : log level
+                           Optional, defaults to logging.INFO
+        format (string)  : tokenized string describing the log format
+                           Optional, defaults to plain message logging:
+                           '%(message)s'
+
+    """
+    logger = logging.getLogger('vfxui')
+    for handler in list(logger.handlers):
+        logger.removeHandler(handler)
+    console = logging.StreamHandler()
+    formatter = logging.Formatter(format)
+    console.setFormatter(formatter)
+    console.setLevel(level)
+    logger.setLevel(level)
+    logger.addHandler(console)
+
+
+initLogging()
 
 
 # -----------------------------------------------------------------------------
@@ -139,55 +169,6 @@ class Dialog(QtWidgets.QDialog):
         Dialog.count += 1
 
     # -------------------------------------------------------------------------
-    @classmethod
-    def _resolveContext(cls):
-        """
-        """
-        if Dialog._context is None:
-            # dictionary mapping sub-contexts to contexts
-            CONTEXT_HASH = {
-                'mayabatch'   : 'maya',
-                'mayapy'      : 'maya',
-                'xsibatch'    : 'xsi',
-                'pythonw'     : 'python',
-                'houdinicore' : 'houdini',
-                'houdinifx'   : 'houdini',
-                'hython'      : 'houdini',
-                'cinema_4d'   : 'cinema4d',
-                'nuke'        : 'nuke'
-            }
-
-            context = os.path.basename(sys.executable)
-            context = cls._conformName(context)
-            context = context.replace('.exe', '')
-            if context in CONTEXT_HASH:
-                context = CONTEXT_HASH[context]
-            else:
-                if context.startswith('nuke'):
-                    context = 'nuke'
-                    try:
-                        import nuke
-                        if nuke.env['studio']:
-                            context = 'nukestudio'
-                    except ImportError:
-                        pass
-
-            Dialog._context = context
-
-    # -------------------------------------------------------------------------
-    def error(self, msg, **kwargs):
-        # DBG
-        print('error: {}'.format(msg))
-    # -------------------------------------------------------------------------
-    def warning(self, msg, **kwargs):
-        # DBG
-        print('warning: {}'.format(msg))
-    # -------------------------------------------------------------------------
-    def exception(self, msg, **kwargs):
-        # DBG
-        print('exception: {}'.format(msg))
-
-    # -------------------------------------------------------------------------
     def done(self, r=0):
         """Keeps track of our global Dialog count and then calls 'QDialog.done'.
 
@@ -265,11 +246,9 @@ class Dialog(QtWidgets.QDialog):
     # -------------------------------------------------------------------------
     @test_display_length.setter
     def test_display_length(self, value):
-        try:
+        with Guard():
             safety = int(value)
             self.__test_display_length = safety
-        except Exception as e:
-            pass
 
     # -------------------------------------------------------------------------
     @property
@@ -314,12 +293,10 @@ class Dialog(QtWidgets.QDialog):
     # -------------------------------------------------------------------------
     @width.setter
     def width(self, value):
-        try:
+        with Guard():
             legal_width = int(value)
             if legal_width > 0:
                 self.__width = legal_width
-        except Exception as e:
-            pass
 
     # -------------------------------------------------------------------------
     @property
@@ -328,12 +305,10 @@ class Dialog(QtWidgets.QDialog):
     # -------------------------------------------------------------------------
     @height.setter
     def height(self, value):
-        try:
+        with Guard():
             legal_height = int(value)
             if legal_height > 0:
                 self.__height = legal_height
-        except Exception as e:
-            pass
 
     # -------------------------------------------------------------------------
     @property
@@ -685,12 +660,12 @@ class Dialog(QtWidgets.QDialog):
             if widget_id in self._widgets.keys():
                 widget = self._widgets[widget_id]
             else:
-                self.warning("Could not locate Widget for ID '%s'" % widget_id)
+                logger.warning("Could not locate Widget for ID '%s'" % widget_id)
                 return None
 
         value = None
 
-        try:
+        with Guard():
             if type(widget) == QtWidgets.QLineEdit:
                 value = widget.text()
             elif type(widget) == QtWidgets.QTextEdit:
@@ -701,8 +676,6 @@ class Dialog(QtWidgets.QDialog):
                 value = widget.isChecked()
             else:
                 value = widget.value()
-        except:
-            pass
 
         return value
 
@@ -814,6 +787,9 @@ class Dialog(QtWidgets.QDialog):
             resolved absolute path
 
         """
+        if path is None:
+            return None
+
         if not self.__source_dir is None:
             if os.path.exists(self.__source_dir):
                 wd = os.getcwd()
@@ -823,8 +799,6 @@ class Dialog(QtWidgets.QDialog):
 
         path = os.path.expandvars(path)
         path = path.replace('\\', '/')
-        if path.endswith('/'):
-            path = path[:-1]
 
         return path
 
@@ -850,7 +824,7 @@ class Dialog(QtWidgets.QDialog):
         result = None
 
         if image_path is None:
-            self.error('not a legal image path:\n%s' % image_path)
+            logger.error('not a legal image path:\n%s' % image_path)
             return None
 
         # legalize paths
@@ -968,7 +942,7 @@ class Dialog(QtWidgets.QDialog):
                                       (optional, defaults to [])
             selected_file (string)  : path of preselected item
                                       (optional, defaults to '')
-            label (string)          : Label of the FileBrowser
+            label (string )         : Label of the FileBrowser
             kwargs (keyword args)   : optional kwargs processed by _processKwargs()
 
         Returns:
@@ -1296,6 +1270,39 @@ class Dialog(QtWidgets.QDialog):
 
     # -------------------------------------------------------------------------
     @classmethod
+    def _resolveContext(cls):
+        """
+        """
+        if Dialog._context is None:
+            # dictionary mapping sub-contexts to contexts
+            CONTEXT_HASH = {
+                'mayabatch'   : 'maya',
+                'mayapy'      : 'maya',
+                'xsibatch'    : 'xsi',
+                'pythonw'     : 'python',
+                'houdinicore' : 'houdini',
+                'houdinifx'   : 'houdini',
+                'hython'      : 'houdini',
+                'cinema_4d'   : 'cinema4d',
+                'nuke'        : 'nuke'
+            }
+
+            context = os.path.basename(sys.executable)
+            context = cls._conformName(context)
+            context = context.replace('.exe', '')
+            if context in CONTEXT_HASH:
+                context = CONTEXT_HASH[context]
+            else:
+                if context.startswith('nuke'):
+                    context = 'nuke'
+                    with Guard():
+                        import nuke
+                        if nuke.env['studio']:
+                            context = 'nukestudio'
+
+            Dialog._context = context
+    # -------------------------------------------------------------------------
+    @classmethod
     def _makePathsAbsoluteInCss(cls, data, ref_path):
         """Patch Css code with the correct absolute paths on the fly.
         """
@@ -1330,8 +1337,6 @@ class Dialog(QtWidgets.QDialog):
                 path = os.path.abspath(path)
                 path = os.path.expandvars(path)
                 path = path.replace('\\', '/')
-                if path.endswith('/'):
-                    path = path[:-1]
 
                 subtokens.pop(0)
                 tail = ')%s' % ')'.join(subtokens)
@@ -1423,7 +1428,7 @@ class Dialog(QtWidgets.QDialog):
             widget = self._widgets[widget_id]
         else:
 
-            self.error('Failed to locate this widget: %s' % widget_id)
+            logger.error('Failed to locate this widget: %s' % widget_id)
         return widget
 
     # -------------------------------------------------------------------------
@@ -1457,7 +1462,7 @@ class Dialog(QtWidgets.QDialog):
                 output.append('    %s' % signal)
             output.append('')
             output.append('='*80)
-            print('\n'.join(output))
+            logger.info('\n'.join(output))
 
         return details
 
@@ -1476,7 +1481,7 @@ class Dialog(QtWidgets.QDialog):
             if self._widgets[key] == widget:
                 return key
 
-        self.error('Failed to locate this widget: %s' % widget)
+        logger.error('Failed to locate this widget: %s' % widget)
         return None
 
 
@@ -1594,10 +1599,8 @@ class Dialog(QtWidgets.QDialog):
 
         for name in dir(widget):
             attr = None
-            try:
+            with Guard():
                 attr = getattr(cls_name, name)
-            except Exception as e:
-                pass
 
             if attr is not None:
                 if isinstance(attr, signal):
@@ -1801,7 +1804,7 @@ class Dialog(QtWidgets.QDialog):
         try:
             self.activateWindow()
         except Exception as e:
-            self.exception('Failed to activate and focus window')
+            logger.exception('Failed to activate and focus window')
 
         self.setFocus()
         self.__ui_built = True
@@ -1933,7 +1936,7 @@ class Dialog(QtWidgets.QDialog):
         """
         """
         if 'font' in kwargs:
-            try:
+            with Guard():
                 font = kwargs['font']
                 font_size = 10
                 if 'font_size' in kwargs:
@@ -1960,30 +1963,23 @@ class Dialog(QtWidgets.QDialog):
                 custom_font.setWeight(font_weight)
                 widget.setFont(custom_font)
 
-            except:
-                pass
-
         if 'font_size' in kwargs:
-            try:
+            with Guard():
                 font_size = int(kwargs['font_size'])
                 font = widget.font()
                 font.setPointSize(font_size)
                 widget.setFont(font)
 
-            except:
-                pass
-
     # -------------------------------------------------------------------------
     def _storeWorkingDirAndFile(self):
         """
         """
-        try:
+        with Guard():
             filename = sys.modules[self.__class__.__module__].__file__
             self.__source_filename = self.conformPath(os.path.basename(filename))
             self.__source_filename = self.__source_filename.replace('.py', '')
             self.__source_dir = self.conformPath(os.path.abspath(os.path.dirname(filename)))
-        except:
-            pass
+
     # -------------------------------------------------------------------------
     @classmethod
     def _versionUp(cls, name):
@@ -2257,4 +2253,33 @@ def msgBox(parent=None,
     status = msgbox.showModal()
 
     return status
+
+
+
+# -----------------------------------------------------------------------------
+class Guard(object):
+
+    # -------------------------------------------------------------------------
+    def __init__(self):
+        """
+        """
+        self.exc_type = None
+        self.exc_value = None
+        self.exc_traceback = None
+
+    # -------------------------------------------------------------------------
+    def __enter__(self):
+        """
+        """
+        return self
+
+    # -------------------------------------------------------------------------
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        """
+        """
+        self.exc_type = exc_type
+        self.exc_value = exc_value
+        self.exc_traceback = exc_traceback
+
+        return True
 

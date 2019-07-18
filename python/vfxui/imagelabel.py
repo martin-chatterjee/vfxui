@@ -60,8 +60,6 @@ class ImageLabel(QtWidgets.QLabel):
 
         path = os.path.expandvars(path)
         path = path.replace('\\', '/')
-        if path.endswith('/'):
-            path = path[:-1]
 
         return path
 
