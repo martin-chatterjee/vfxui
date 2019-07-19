@@ -9,13 +9,10 @@ import time
 import importlib
 import imp
 
-# DBG
-import sehsucht
-
 import vfxui.dialog as dlg
 
 from vfxui.pyside import QtCore, QtGui, QtWidgets, QtTest
-from vfxui.dialog import Dialog
+from vfxui.dialog import Dialog, createDialog, ListRow
 from complexDialog import ComplexDialog
 
 from vfxtest import TestCase, mock
@@ -35,9 +32,6 @@ class UI_Dialog_Test(TestCase):
 
         cls.display_length = 100
         cls.time_between_emits = .1
-
-        # cls.display_length = 0
-        # cls.time_between_emits = 0
 
 
     # -------------------------------------------------------------------------
@@ -896,6 +890,7 @@ class UI_Dialog_Test(TestCase):
                                   test_display_length=self.display_length)
 
         btn = dialog.addButton(widget_id='proof',
+                               icon_path='ressources/search.png',
                                color='#ff00ff')
 
         self.assertEqual(dialog.getWidget('proof'), btn)
@@ -928,7 +923,88 @@ class UI_Dialog_Test(TestCase):
         # dialog.close()
         dialog = None
 
+    # -------------------------------------------------------------------------
+    def test36_insertWidget_lets_us_insert_functioning_Dialog_object(self):
 
+        class MyRow(dlg.Dialog):
+            def initialize(self, **kwargs):
+                self.content = 'Label content'
+
+            def defineLayout(self):
+                self.addSpacer(10)
+                self.label = self.addLabel(label=self.content)
+                self.addButton(widget_id='btn_proof', label='click me')
+
+            def slot_btn_proof_released(self):
+                self.label.setText('I clicked da button!')
+
+
+        dialog = dlg.createDialog(title='dialog title',
+                                  test_mode='ok',
+                                  test_display_length=self.display_length)
+        row = MyRow()
+        wdg = dialog.insertWidget(widget_id='proof', widget=row)
+
+        self.assertEqual(dialog.getWidget('proof'), row)
+        self.assertTrue(isinstance(dialog.getWidget('proof'), MyRow))
+        self.assertTrue(dialog.getWidget('proof').is_child_widget)
+
+        result = dialog.showModal()
+        self.assertTrue(result)
+        dialog = None
+
+    # -------------------------------------------------------------------------
+    def test37_insertWidget_only_accepts_QWidgets_raises_AttributeError_if_otherwise(self):
+
+        dialog = dlg.createDialog(title='dialog title',
+                                  test_mode='ok',
+                                  test_display_length=self.display_length)
+        with self.assertRaises(AttributeError):
+            dialog.insertWidget('foo bar')
+
+    # -------------------------------------------------------------------------
+    def test38_Dialog_as_child_widget_showModal_raises_AttributeError(self):
+
+        dialog = dlg.createDialog(title='dialog title',
+                                  test_mode='ok',
+                                  test_display_length=self.display_length)
+        dialog.is_child_widget = True
+
+        with self.assertRaises(AttributeError):
+            dialog.showModal()
+
+    # -------------------------------------------------------------------------
+    def test39_nestedDialogs(self):
+
+        class Child(Dialog):
+            def defineLayout(self):
+                self.openRow()
+                self.btn = self.addButton(widget_id='btn', label='Booh')
+                self.label = self.addLabel(label='Aaaah!')
+                self.closeRow()
+
+        class Main(Dialog):
+            def defineLayout(self):
+                a = Child()
+                self.a = self.insertWidget(a, widget_id='a')
+                self.addSpacer(20)
+                b = Child()
+                self.b = self.insertWidget(b, widget_id='b')
+
+        dialog = createDialog(targetclass=Main,
+                              test_mode='ok',
+                              test_display_length=self.display_length)
+        dialog.showModal()
+
+        dialog.a.clear()
+        dialog.a.rebuild()
+        # dialog.redraw()
+        # time.sleep(self.display_length)
+
+        # dialog.rebuild()
+
+        dialog.close()
+        dialog = None
     # -------------------------------------------------------------------------
     def test92_contextNuke(self):
 
@@ -942,28 +1018,24 @@ class UI_Dialog_Test(TestCase):
             except RuntimeError:
                 pass
 
-            Dialog._context = 'nuke'
+            Dialog._context = None
             try:
-                dialog = dlg.createDialog(title='dialog title',
-                                          width=400,
-                                          height=100,
-                                          fixed_size=False,
-                                          test_mode='ok',
-                                          test_display_length=self.display_length)
+                with mock.patch('sys.executable', 'c:/foo/nuke11.1.exe'):
+                    dialog = dlg.createDialog(title='dialog title',
+                                              width=400,
+                                              height=100,
+                                              fixed_size=False,
+                                              test_mode='ok',
+                                              test_display_length=self.display_length)
 
 
-                ret_val = dialog.showModal()
-                self.assertTrue(ret_val)
+                    ret_val = dialog.showModal()
+                    self.assertTrue(ret_val)
 
-                self.assertEqual(dialog.context, 'nuke')
-                # self.assertEqual(len(dialog.apis), 2)
-                # self.assertTrue('nuke' in dialog.apis)
-                # self.assertEqual(dialog.apis['nuke'], os)
-                # self.assertTrue('nukescripts' in dialog.apis)
-                # self.assertEqual(dialog.apis['nukescripts'], os)
+                    self.assertEqual(dialog.context, 'nuke')
 
-                dialog.close()
-                dialog = None
+                    dialog.close()
+                    dialog = None
 
             finally:
                 Dialog._context = None
@@ -985,23 +1057,25 @@ class UI_Dialog_Test(TestCase):
             dlg.Dialog.app = QtWidgets.QApplication(sys.argv)
 
 
-        Dialog._context = 'houdini'
+        Dialog._context = None
         try:
-            dialog = dlg.createDialog(title='dialog title',
-                                      width=400,
-                                      height=100,
-                                      fixed_size=False,
-                                      test_mode='ok',
-                                      test_display_length=self.display_length)
+            with mock.patch('sys.executable', 'c:/foo/houdini.exe'):
+
+                dialog = dlg.createDialog(title='dialog title',
+                                          width=400,
+                                          height=100,
+                                          fixed_size=False,
+                                          test_mode='ok',
+                                          test_display_length=self.display_length)
 
 
-            ret_val = dialog.showModal()
-            self.assertTrue(ret_val)
+                ret_val = dialog.showModal()
+                self.assertTrue(ret_val)
 
-            self.assertEqual(dialog.context, 'houdini')
+                self.assertEqual(dialog.context, 'houdini')
 
-            dialog.close()
-            dialog = None
+                dialog.close()
+                dialog = None
 
         finally:
             sys.modules.pop('hou')
@@ -1027,54 +1101,49 @@ class UI_Dialog_Test(TestCase):
             mocked_maya_window = QtWidgets.QDialog()
             mocked_maya_window.setObjectName('MayaWindow')
 
-            Dialog._context = 'maya'
+            Dialog._context = None
 
             try:
-                dialog = dlg.createDialog(title='dialog title',
-                                          width=400,
-                                          height=100,
-                                          fixed_size=False,
-                                          test_mode=False,
-                                          test_display_length=self.display_length)
+                with mock.patch('sys.executable', 'c:/foo/maya.exe'):
 
-                dialog.addSpacer(30)
-                widget = dialog.addFileBrowser(
-                                    mode='open',
-                                    width=300,
-                                    label='awesome open Browser',
-                                    initialdir=basepath,
-                                    selected_file='run_all_tests.py',
-                                    filters=['Python (*.py)'])
+                    dialog = dlg.createDialog(title='dialog title',
+                                              width=400,
+                                              height=100,
+                                              fixed_size=False,
+                                              test_mode=False,
+                                              test_display_length=self.display_length)
 
-                dialog.addSpacer(30)
+                    dialog.addSpacer(30)
+                    widget = dialog.addFileBrowser(
+                                        mode='open',
+                                        width=300,
+                                        label='awesome open Browser',
+                                        initialdir=basepath,
+                                        selected_file='run_all_tests.py',
+                                        filters=['Python (*.py)'])
+
+                    dialog.addSpacer(30)
 
 
-                ret_val = dialog.show()
-                time.sleep(self.time_between_emits)
-                button = widget.button
-                widget.test_mode = 'accept'
-                widget.test_delay = self.time_between_emits
-                button.click()
-                dialog.redraw()
-                time.sleep(self.time_between_emits)
-                self.assertEqual(widget.targetfile, u'run_all_tests.py')
-                self.assertEqual(widget.targetfolder.lower(),
-                                 basepath.lower())
+                    ret_val = dialog.show()
+                    time.sleep(self.time_between_emits)
+                    button = widget.button
+                    widget.test_mode = 'accept'
+                    widget.test_delay = self.time_between_emits
+                    button.click()
+                    dialog.redraw()
+                    time.sleep(self.time_between_emits)
+                    self.assertEqual(widget.targetfile, u'run_all_tests.py')
+                    self.assertEqual(widget.targetfolder.lower(),
+                                     basepath.lower())
 
-                self.assertEqual(dialog.context, 'maya')
-                # self.assertEqual(len(dialog.apis), 3)
-                # self.assertTrue('maya.cmds' in dialog.apis)
-                # self.assertTrue('pymel.core' in dialog.apis)
-                # self.assertTrue('maya.mel' in dialog.apis)
-                # self.assertEqual(dialog.apis['maya.cmds'], mocked_cmds)
-                # self.assertEqual(dialog.apis['pymel.core'], mocked_cmds)
-                # self.assertEqual(dialog.apis['maya.mel'], mocked_cmds)
+                    self.assertEqual(dialog.context, 'maya')
 
-                dialog.close()
-                dialog = None
+                    dialog.close()
+                    dialog = None
 
-                mocked_maya_window.close()
-                mocked_maya_window = None
+                    mocked_maya_window.close()
+                    mocked_maya_window = None
 
             finally:
                 Dialog._context = None

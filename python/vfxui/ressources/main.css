@@ -1,9 +1,8 @@
 
 QWidget {
     margin:0px 0px;
-    padding:1px 0px;
     padding:0px 0px;
-    spacing:0px;
+    border:0px;
     color: #bfc2c2;
     background-color:#444444;
 }
@@ -13,8 +12,6 @@ QWidget[labelClass="splashscreen"] {
 }
 
 QWidget[labelClass="Headline"] {
-
-    /*background-color: #545353;*/
     background-color: #00a1d1;
     border-radius: 3px;
     padding:10px 30px;
@@ -24,30 +21,32 @@ QWidget[labelClass="Headline"] {
 QDialog  {
     margin:0px 0px;
     padding:0px 0px;
-    spacing:0px;
+    background-color:#444444;
 }
 
 
 QHBoxLayout  {
     margin:0px 0px;
     padding:0px 0px;
+    border:0px;
 }
 
 QVBoxLayout  {
     margin:0px 0px;
     padding:0px 0px;
+    border:0px;
 }
 
 QSpacerItem {
     margin:0px 0px;
     padding:0px 0px;
-    spacing:0px;
 }
 
 QLineEdit {
     background-color:#2b2b2b;
-    padding: 1px 0px;
-    /*margin:1px 5px 0px 1px;*/
+    /*padding: 1px 0px;*/
+    padding: 1px 0px 1px 10px;
+
     border: 1px solid #5d5d5d;
     border: 1px solid #545353;
     border-radius:2px;
@@ -68,7 +67,6 @@ QTextEdit {
 
     background-color:#2b2b2b;
     padding: 1px 0px;
-    /*margin:1px 5px 0px 1px;*/
     border: 1px solid #5d5d5d;
     border: 1px solid #545353;
     border-radius:2px;
@@ -87,14 +85,12 @@ QTextEdit:disabled {
 }
 
 
-QDialog {
-
-    background-color:#444444;
-    color: #FF00FF;
-}
-
 QLabel {
+    margin:0px;
+    padding:0px;
+    /*background-color: #ff0000;*/
 }
+
 
 QGroupBox  {
 
@@ -108,10 +104,6 @@ QGroupBox  {
     font-weight:bold;
 }
 
-/*QGroupBox[labelClass="less_prominent"] {
-    color:#858585;
-}
-*/
 [labelClass="less_prominent"] {
     color:#858585;
 }
@@ -136,33 +128,22 @@ QPushButton  {
 }
 
 QPushButton:focus {
-    border-image: url(ressources/highlight.png) 0 0 0 0 stretch stretch;
+    /*border-image: url(ressources/highlight.png) 0 0 0 0 stretch stretch;*/
+    background-color:#808080;
 }
 QPushButton:hover {
-    border-image: url(ressources/highlight.png) 0 0 0 0 stretch stretch;
+    /*border-image: url(ressources/highlight.png) 0 0 0 0 stretch stretch;*/
+    background-color:#808080;
 }
 QPushButton:pressed {
     border-image: None;
 }
 
-/*QPushButton[labelClass="SubmitButton"] {
-    background-color: #00a1d1;
-}
-*/
 
 QPushButton:disabled {
     background-color:#505050;
     color:#858585;
 }
-
-/*QPushButton[labelClass="SubmitButton"]:hover {
-    background-color: #3ab7e8;
-}
-*/
-/*QPushButton[labelClass="SubmitButton"]:pressed {
-    background-color: #00a1d1;
-}
-*/
 
 
 QTabBar  {
@@ -172,7 +153,6 @@ QTabBar  {
 QTabWidget::pane  {
     background-color: #444444;
     border:1px solid #333333;
-    /*border-top:none;*/
     border-bottom-left-radius:5px;
     border-bottom-right-radius:5px;
 }
@@ -304,19 +284,42 @@ Divider QFrame {
     background-color:#333333;
 }
 
+
+
 QListWidget {
     background-color:#2b2b2b;
     border: 1px solid #545353;
     border-radius:2px;
     outline:0;
-
 }
 
 QListWidget::item {
-    padding: 5px 0px;
+    padding: 5px 20px;
     border-top: 1px solid #393939;
-
 }
+
+QListWidget::item QLabel {
+    padding: 0px 5px;
+    background-color: None;
+}
+
+QListWidget::item ListRow  {
+    padding: 0px 5px;
+
+    margin:0px;
+    background-color: None;
+}
+QListWidget::item ListRow QPushButton {
+    margin: 0px 10px;
+}
+
+QListWidget::item ListRow QLabel {
+    padding: 0px 5px;
+    margin: 0px;
+    border: 0px;
+    background-color: None;
+}
+
 
 QListWidget::item:selected {
     background-color:#00a1d1;
@@ -350,7 +353,6 @@ QComboBox {
 QComboBox:drop-down{
     border: 2px;
     padding:0px 6px 0px 0px;
-    /*border-left: 1px solid red;*/
 }
 
 QComboBox::down-arrow {
@@ -372,3 +374,57 @@ QComboBox:disabled {
 QScrollArea {
     border: None;
 }
+
+
+FilterLine ImageLabel[labelClass='searchIcon'] {
+    background-color:#2b2b2b;
+    padding: 1px 0px;
+    border: 1px solid #545353;
+    border-radius:2px;
+    border-right:none;
+    border-top-right-radius: none;
+    border-bottom-right-radius: none;
+}
+
+FilterLine QLineEdit {
+    border-left: none;
+    border-right: none;
+    padding:0px 0px 1px 3px;
+    border-radius:none;
+}
+
+FilterLine ImageLabel[labelClass='clearIcon'] {
+    background-color:#2b2b2b;
+    padding: 1px 0px;
+    border: 1px solid #545353;
+    border-radius:2px;
+    border-left:none;
+    border-top-left-radius: none;
+    border-bottom-left-radius: none;
+}
+
+
+ListBox QPushButton[labelClass="selectionControl"] {
+    background-color: #00a1d1;
+    background-color: #666666;
+    color: #cccccc;
+    font-size:11px;
+    padding:2px 3px;
+}
+
+ListBox QPushButton:focus[labelClass="selectionControl"] {
+    border-image:none;
+}
+ListBox QPushButton:hover[labelClass="selectionControl"] {
+    border-image: url(ressources/highlight.png) 0 0 0 0 stretch stretch;
+}
+ListBox QPushButton:pressed[labelClass="selectionControl"] {
+    background-color: #00a1d1;
+}
+
+ListBox QLabel[labelClass="labelSelect"] {
+    font-size:11px;
+    color:#999999;
+
+}
+

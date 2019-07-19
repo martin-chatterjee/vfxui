@@ -22,6 +22,7 @@ from .filebrowser import FileBrowser
 from .imagelabel import ImageLabel
 from .listbox import ListBox
 from .divider import Divider
+from .guard import Guard
 
 logger = logging.getLogger('vfxui')
 """vfxtest logger"""
@@ -96,6 +97,8 @@ class Dialog(QtWidgets.QDialog):
         ## dialog title.
         self.__title = 'Dialog'
 
+        self.__is_child_widget = False
+
         ## full path to the file of the current class implementation
         self.__source_filename = None
         ## full path to the folder of the current class implementation
@@ -166,15 +169,29 @@ class Dialog(QtWidgets.QDialog):
 
         self.__ui_built = False
 
-        Dialog.count += 1
+        if not self.is_child_widget:
+            Dialog.count += 1
 
     # -------------------------------------------------------------------------
     def done(self, r=0):
         """Keeps track of our global Dialog count and then calls 'QDialog.done'.
 
         """
-        Dialog.count -= 1
+        if not self.is_child_widget:
+            Dialog.count -= 1
         super(Dialog, self).done(r)
+
+    # -------------------------------------------------------------------------
+    @property
+    def is_child_widget(self):
+        """
+        """
+        return self.__is_child_widget
+    @is_child_widget.setter
+    def is_child_widget(self, value):
+        self.__is_child_widget = False
+        if value is True:
+            self.__is_child_widget = True
 
     # -------------------------------------------------------------------------
     @property
@@ -376,8 +393,9 @@ class Dialog(QtWidgets.QDialog):
         """Flags the current dialog window type to act as a splash screen.
 
         """
-        self.setWindowFlags(self.windowFlags() | QtCore.Qt.SplashScreen)
-        self.setProperty('labelClass', 'splashscreen')
+        if not self.is_child_widget:
+            self.setWindowFlags(self.windowFlags() | QtCore.Qt.SplashScreen)
+            self.setProperty('labelClass', 'splashscreen')
 
     # -------------------------------------------------------------------------
     def addTabsGroup(self, widget_id='tabsgroup'):
@@ -942,7 +960,7 @@ class Dialog(QtWidgets.QDialog):
                                       (optional, defaults to [])
             selected_file (string)  : path of preselected item
                                       (optional, defaults to '')
-            label (string )         : Label of the FileBrowser
+            label (string)          : Label of the FileBrowser
             kwargs (keyword args)   : optional kwargs processed by _processKwargs()
 
         Returns:
@@ -969,7 +987,12 @@ class Dialog(QtWidgets.QDialog):
     # -------------------------------------------------------------------------
     def addListBox(self,
                    widget_id='listBox',
+                   filtering=False,
                    multiselect=False,
+                   selection_controls=False,
+                   selection_control_position='left',
+                   row_height=35,
+                   filter_row_height=35,
                    content=[],
                    **kwargs):
         """Adds a List box.
@@ -988,9 +1011,27 @@ class Dialog(QtWidgets.QDialog):
         """
         result = None
         # create widget
-        widget = ListBox()
-        if multiselect:
-            widget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        widget = ListBox(filtering=filtering,
+                         multiselect=multiselect,
+                         selection_controls=selection_controls,
+                         selection_control_position=selection_control_position,
+                         row_height=row_height,
+                         filter_row_height=filter_row_height,
+                         **kwargs)
+
+
+        # # prepare rows
+        # rows = []
+        # for index, value in enumerate(content):
+        #     row = value
+        #     # if isinstance(value, ListRow):
+        #     #     row = value
+        #     # else:
+        #     #     row = ListRow(value=value, index=index, **kwargs)
+        #     rows.append(row)
+
+        # widget.addItems(rows)
+
 
         widget.addItems(content)
 
@@ -1158,8 +1199,22 @@ class Dialog(QtWidgets.QDialog):
         return widget
 
     # -------------------------------------------------------------------------
+    def insertWidget(self, widget, widget_id='inserted-widget'):
+        """Inserts an already existing QWidget into the Dialog.
+
+        """
+        if not isinstance(widget, QtWidgets.QWidget):
+            raise AttributeError('Not a QWidget: {}'.widget)
+
+        if isinstance(widget, Dialog):
+            widget.is_child_widget = True
+        widget_id = self._storeWidget(widget, widget_id)
+        return widget
+
+    # -------------------------------------------------------------------------
     def addWidget(self,
-                  widget_id='widget'):
+                  widget_id='widget',
+                  **kwargs):
         """Adds an empty widget.
 
         Args:
@@ -1172,6 +1227,7 @@ class Dialog(QtWidgets.QDialog):
         result = None
         # create widget
         widget = QtWidgets.QWidget()
+        self._processKwargs(widget, kwargs)
 
         # store widget
         widget_id = self._storeWidget(widget, widget_id)
@@ -1183,6 +1239,7 @@ class Dialog(QtWidgets.QDialog):
                   label='clickMe...',
                   color=None,
                   color_disabled=None,
+                  icon_path=None,
                   **kwargs):
         """Adds a Button.
 
@@ -1212,6 +1269,17 @@ class Dialog(QtWidgets.QDialog):
                          ' QPushButton:disabled {background-color:%s;}' \
                          % (color, color_disabled)
             widget.setStyleSheet(stylesheet)
+
+        if icon_path is not None:
+            icon_path = self.conformPath(icon_path)
+            print('>WTF {}'.format(icon_path))
+            if os.path.exists(icon_path):
+                icon = QtGui.QIcon()
+                pixmap = QtGui.QPixmap(icon_path)
+                icon.addPixmap(pixmap)
+                widget.setIcon(icon)
+                widget.setIconSize(pixmap.size())
+
 
         self._processKwargs(widget, kwargs)
 
@@ -1273,34 +1341,34 @@ class Dialog(QtWidgets.QDialog):
     def _resolveContext(cls):
         """
         """
-        if Dialog._context is None:
-            # dictionary mapping sub-contexts to contexts
-            CONTEXT_HASH = {
-                'mayabatch'   : 'maya',
-                'mayapy'      : 'maya',
-                'xsibatch'    : 'xsi',
-                'pythonw'     : 'python',
-                'houdinicore' : 'houdini',
-                'houdinifx'   : 'houdini',
-                'hython'      : 'houdini',
-                'cinema_4d'   : 'cinema4d',
-                'nuke'        : 'nuke'
-            }
+        # dictionary mapping sub-contexts to contexts
+        CONTEXT_HASH = {
+            'mayabatch'   : 'maya',
+            'mayapy'      : 'maya',
+            'xsibatch'    : 'xsi',
+            'pythonw'     : 'python',
+            'houdinicore' : 'houdini',
+            'houdinifx'   : 'houdini',
+            'hython'      : 'houdini',
+            'cinema_4d'   : 'cinema4d',
+            'nuke'        : 'nuke'
+        }
 
-            context = os.path.basename(sys.executable)
-            context = cls._conformName(context)
-            context = context.replace('.exe', '')
-            if context in CONTEXT_HASH:
-                context = CONTEXT_HASH[context]
-            else:
-                if context.startswith('nuke'):
-                    context = 'nuke'
-                    with Guard():
-                        import nuke
-                        if nuke.env['studio']:
-                            context = 'nukestudio'
+        context = os.path.basename(sys.executable)
+        context = cls._conformName(context)
+        context = context.replace('.exe', '')
+        if context in CONTEXT_HASH:
+            context = CONTEXT_HASH[context]
+        else:
+            if context.startswith('nuke'):
+                context = 'nuke'
+                with Guard():
+                    import nuke
+                    if nuke.env['studio']:
+                        context = 'nukestudio'
 
-            Dialog._context = context
+        Dialog._context = context
+
     # -------------------------------------------------------------------------
     @classmethod
     def _makePathsAbsoluteInCss(cls, data, ref_path):
@@ -1375,10 +1443,11 @@ class Dialog(QtWidgets.QDialog):
         """Clears all previous layout work and created widgets.
 
         """
-        QtWidgets.QWidget().setLayout(self._layout_main)
-        self._layout_main = QtWidgets.QVBoxLayout()
-
-        self.setLayout(self._layout_main)
+        for i in reversed(range(self._layout_main.count())):
+            self._layout_main.takeAt(i)
+        for item in self._widgets:
+            widget = self._widgets[item]
+            widget.setParent(None)
 
         self._widgets = {}
         self._openStructures = []
@@ -1395,12 +1464,20 @@ class Dialog(QtWidgets.QDialog):
         QtCore.QCoreApplication.processEvents()
 
     # -------------------------------------------------------------------------
+    def rebuild(self, modal=False, **kwargs):
+        """
+        """
+        modal = self.last_view_modal
+        self._create(rebuild=True, modal=modal, **kwargs)
+
+    # -------------------------------------------------------------------------
     def show(self):
         """Displays the dialog non-modally.
 
         """
         self._create(modal=False)
-        self.dialogOpen.emit()
+        if not self.is_child_widget:
+            self.dialogOpen.emit()
 
         super(Dialog, self).show()
 
@@ -1506,6 +1583,10 @@ class Dialog(QtWidgets.QDialog):
         """Displays the dialog modally.
 
         """
+
+        if self.is_child_widget:
+            raise AttributeError("Can't be shown modally, is being used as a child widget")
+
         self._create(modal=True)
         self.dialogOpen.emit()
         self.modal_return_value = False
@@ -1761,19 +1842,29 @@ class Dialog(QtWidgets.QDialog):
 
 
     # -------------------------------------------------------------------------
-    def _constructLayout(self, modal=False):
+    def _constructLayout(self, modal=False, rebuild=False, **kwargs):
         """Constructs and initialises all widgets and layout structures.
 
         """
+        # if rebuild is False:
         # add an empty invisible widget to catch the initial focus
         self._focus_catching_widget = QtWidgets.QWidget()
         self._getActiveLayout().addWidget(self._focus_catching_widget)
 
         # first call defineLayout() which might be implemented by the user
-        self.defineLayout()
+        self.defineLayout(**kwargs)
 
         # close all open structures
         self._closeAllOpenStructures()
+
+        # trigger creation of any nested Dialog objects
+        for item_id in self._widgets:
+            item = self._widgets[item_id]
+            if isinstance(item, Dialog):
+                item._layout_main.setContentsMargins(0, 0, 0, 0)
+                item._layout_main.setSpacing(0)
+
+                item._create()
 
         # add one last stretch
         if self.add_last_stretch:
@@ -1864,8 +1955,9 @@ class Dialog(QtWidgets.QDialog):
         while status == True:
             status = self._closeStructure()
 
+
     # -------------------------------------------------------------------------
-    def _create(self, modal=False):
+    def _create(self, modal=False, rebuild=False, **kwargs):
         """Creates/initialises the Dialog.
 
         Makes sure that this gets called only once.
@@ -1873,6 +1965,9 @@ class Dialog(QtWidgets.QDialog):
         Size, Title and layout get constructed here.
 
         """
+        if rebuild is True:
+            self.clear()
+
         # is the dialog already created?
         if self.created == True:
             # do we need to repopulate it?
@@ -1883,14 +1978,15 @@ class Dialog(QtWidgets.QDialog):
                 # stop here
                 return
 
-        self.setWindowTitle(self.__title)
+        if rebuild is False:
+            self.setWindowTitle(self.__title)
 
-        if self.fixed_size == True:
-            self.setFixedSize(self.width, self.height)
-        else:
-            self.resize(self.width, self.height)
+            if self.fixed_size == True:
+                self.setFixedSize(self.width, self.height)
+            else:
+                self.resize(self.width, self.height)
 
-        self._constructLayout(modal)
+        self._constructLayout(modal=modal, rebuild=rebuild, **kwargs)
 
         # flag as 'created'
         self.__created = True
@@ -1977,7 +2073,7 @@ class Dialog(QtWidgets.QDialog):
         with Guard():
             filename = sys.modules[self.__class__.__module__].__file__
             self.__source_filename = self.conformPath(os.path.basename(filename))
-            self.__source_filename = self.__source_filename.replace('.py', '')
+            self.__source_filename = self.__source_filename.replace('.pyc', '').replace('.py', '')
             self.__source_dir = self.conformPath(os.path.abspath(os.path.dirname(filename)))
 
     # -------------------------------------------------------------------------
@@ -2139,6 +2235,79 @@ def createDialog(targetclass=None, parent=None, **kwargs):
     return dialog
 
 # -----------------------------------------------------------------------------
+class ListRow(Dialog):
+    """
+    """
+    is_list_row = True
+
+    # -------------------------------------------------------------------------
+    def initialize(self, value=None, index=0, keywords='', **kwargs):
+        """
+        """
+        self.kwargs = kwargs
+        self.value = value
+        self.index = index
+        self.keywords = keywords
+        self.is_child_widget = True
+        self.add_last_stretch = False
+        self._layout_main.setContentsMargins(0, 0, 0, 0)
+        self._layout_main.setSpacing(0)
+
+    # -------------------------------------------------------------------------
+    @property
+    def listbox(self):
+        return self.parent().parent().parent().parent()
+    # -------------------------------------------------------------------------
+    @property
+    def listrow(self):
+        listbox = self.listbox
+        for i in range(self.listbox.count()):
+            row = self.listbox.item(i)
+            if row.value == self:
+                return row
+    # -------------------------------------------------------------------------
+    @property
+    def filter_keywords(self):
+        return '{} {}'.format(self.value, self.keywords).lower()
+
+    # -------------------------------------------------------------------------
+    def defineLeftLayout(self):
+        pass
+    # -------------------------------------------------------------------------
+    def defineRightLayout(self):
+        pass
+
+
+    # -------------------------------------------------------------------------
+    def defineLayout(self):
+        """
+        """
+        self.openRow()
+
+        self.defineLeftLayout()
+        self.label = self.addLabel(**self.kwargs)
+        if self.value is not None:
+            self.label.setText(self.value)
+        self.defineRightLayout()
+
+    # -------------------------------------------------------------------------
+    def build(self, add_stretch=False, **kwargs):
+        """
+        """
+        # if add_stretch:
+        #     self.addStretch()
+        self.closeRow()
+
+        self._create()
+
+    # -------------------------------------------------------------------------
+    def update(self):
+        """
+        """
+        self.label.setText(self.value)
+
+
+# -----------------------------------------------------------------------------
 class MsgBox(Dialog):
     """Creates a Messagebox with the provided title, message and button labels.
 
@@ -2253,33 +2422,4 @@ def msgBox(parent=None,
     status = msgbox.showModal()
 
     return status
-
-
-
-# -----------------------------------------------------------------------------
-class Guard(object):
-
-    # -------------------------------------------------------------------------
-    def __init__(self):
-        """
-        """
-        self.exc_type = None
-        self.exc_value = None
-        self.exc_traceback = None
-
-    # -------------------------------------------------------------------------
-    def __enter__(self):
-        """
-        """
-        return self
-
-    # -------------------------------------------------------------------------
-    def __exit__(self, exc_type, exc_value, exc_traceback):
-        """
-        """
-        self.exc_type = exc_type
-        self.exc_value = exc_value
-        self.exc_traceback = exc_traceback
-
-        return True
 

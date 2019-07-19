@@ -29,6 +29,11 @@ class ImageLabel(QtWidgets.QLabel):
         self.image_hi = image_hi
 
         self.setPixmap(self.image)
+        self.setFixedWidth(self.image.width())
+        self.setFixedHeight(self.image.height())
+
+        if self.image_hi is not None:
+            self.setCursor(QtCore.Qt.PointingHandCursor)
 
         self.working_dir = working_dir
 
@@ -62,6 +67,9 @@ class ImageLabel(QtWidgets.QLabel):
         path = path.replace('\\', '/')
 
         return path
+
+
+
 
     # -------------------------------------------------------------------------
     def leaveEvent(self, event):
