@@ -50,7 +50,7 @@ QLineEdit {
     border: 1px solid #5d5d5d;
     border: 1px solid #545353;
     border-radius:2px;
-    font-size:12px;
+    /*font-size:12px;*/
 }
 
 QLineEdit[labelClass="readonly"]{
@@ -71,7 +71,7 @@ QTextEdit {
     border: 1px solid #545353;
     border-radius:2px;
     spacing: 0px;
-    font-size:12px;
+    /*font-size:12px;*/
 }
 
 QTextEdit[labelClass="readonly"]{
@@ -107,6 +107,30 @@ QGroupBox  {
 [labelClass="less_prominent"] {
     color:#858585;
 }
+
+[labelClass="no_frame"] {
+    border:None;
+}
+
+[labelClass="no_frame_no_label"] {
+    border:None;
+    margin:0px;
+    padding:0px;
+}
+
+[labelClass="no_frame_no_label_less_prominent"] {
+    border:None;
+    margin:0px;
+    padding:0px;
+    color:#858585;
+}
+
+[labelClass="no_frame_less_prominent"] {
+    border:None;
+    color:#858585;
+}
+
+
 
 QGroupBox::title {
     subcontrol-origin: margin;

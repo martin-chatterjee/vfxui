@@ -57,6 +57,9 @@ class FilterLine(QtWidgets.QWidget):
         self.filter_line = QtWidgets.QLineEdit()
         self.filter_line.setPlaceholderText(placeholder)
         self.filter_line.setFixedHeight(row_height)
+
+        self._dealWithCustomFont(self.filter_line, kwargs)
+
         shortcut = QtWidgets.QShortcut(
             QtGui.QKeySequence(QtCore.Qt.Key_Tab),
             self.filter_line,
@@ -77,6 +80,45 @@ class FilterLine(QtWidgets.QWidget):
         self.layout.addWidget(self.filter_line)
         self.layout.addWidget(self.clear_icon)
         self.setLayout(self.layout)
+
+    # -------------------------------------------------------------------------
+    def _dealWithCustomFont(self, widget, kwargs):
+        """
+        """
+        if 'font' in kwargs:
+            with Guard():
+                font = kwargs['font']
+                font_size = 10
+                if 'font_size' in kwargs:
+                    font_size = int(kwargs['font_size'])
+                font_spacing = 0.0
+                if 'font_spacing' in kwargs:
+                    font_spacing = float(kwargs['font_spacing'])
+
+                font_weight = QtGui.QFont.Normal
+                if 'font_weight' in kwargs:
+                    value = kwargs['font_weight'].lower()
+                    font_weight_values = {
+                                            'normal' : QtGui.QFont.Normal,
+                                            'light' : QtGui.QFont.Light,
+                                            'demibold' : QtGui.QFont.DemiBold,
+                                            'bold' : QtGui.QFont.Bold,
+                                            'black' : QtGui.QFont.Black
+                                         }
+                    if value in font_weight_values:
+                        font_weight = font_weight_values[value]
+                custom_font = QtGui.QFont(font, font_size)
+                custom_font.setLetterSpacing(QtGui.QFont.AbsoluteSpacing, font_spacing)
+                custom_font.setWordSpacing(font_spacing)
+                custom_font.setWeight(font_weight)
+                widget.setFont(custom_font)
+
+        if 'font_size' in kwargs:
+            with Guard():
+                font_size = int(kwargs['font_size'])
+                font = widget.font()
+                font.setPointSize(font_size)
+                widget.setFont(font)
 
     # -------------------------------------------------------------------------
     def slot_filter_line_filterTabPressed(self):

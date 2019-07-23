@@ -470,13 +470,17 @@ class Dialog(QtWidgets.QDialog):
         """
         #create group
         group = None
-        if frame == True:
-            group = QtWidgets.QGroupBox(label)
-        else:
-            group = QtWidgets.QWidget()
-
+        group = QtWidgets.QGroupBox(label)
+        label_classes = []
+        if frame is False:
+            label_classes.append('no_frame')
+        if label == '':
+            label_classes.append('no_label')
         if prominent is False:
-            group.setProperty('labelClass', 'less_prominent')
+            label_classes.append('less_prominent')
+
+
+        group.setProperty('labelClass', '_'.join(label_classes))
 
         self._processKwargs(group, kwargs)
 
@@ -525,7 +529,7 @@ class Dialog(QtWidgets.QDialog):
         return scrollarea
 
     # -------------------------------------------------------------------------
-    def openRow(self):
+    def openRow(self, **kwargs):
         """Opens a Row.
 
         Returns:
@@ -538,10 +542,11 @@ class Dialog(QtWidgets.QDialog):
         layout.setSpacing(0)
 
         self._addOpenStructure(widget, layout)
+        self._processKwargs(widget, kwargs)
         return widget
 
     # -------------------------------------------------------------------------
-    def openColumn(self):
+    def openColumn(self, **kwargs):
         """Opens a column.
 
         Returns:
@@ -554,6 +559,7 @@ class Dialog(QtWidgets.QDialog):
         layout.setSpacing(0)
 
         self._addOpenStructure(widget, layout)
+        self._processKwargs(widget, kwargs)
         return widget
 
     # -------------------------------------------------------------------------
@@ -893,7 +899,7 @@ class Dialog(QtWidgets.QDialog):
 
         # create widget
         if multiline:
-            widget = QtWidgets.QTextEdit()
+            widget = QTextEdit()
         else:
             widget = QtWidgets.QLineEdit()
 
@@ -905,6 +911,10 @@ class Dialog(QtWidgets.QDialog):
 
         widget.setText(value)
         widget.setAlignment(QtCore.Qt.AlignTop)
+
+        if 'placeholder' in kwargs:
+            widget.setPlaceholderText(kwargs['placeholder'])
+
 
         self._processKwargs(widget, kwargs)
 
@@ -2060,6 +2070,7 @@ class Dialog(QtWidgets.QDialog):
                 widget.setFont(custom_font)
 
         if 'font_size' in kwargs:
+            print('WTF {}'.format(kwargs['font_size']))
             with Guard():
                 font_size = int(kwargs['font_size'])
                 font = widget.font()
@@ -2423,3 +2434,59 @@ def msgBox(parent=None,
 
     return status
 
+
+# -----------------------------------------------------------------------------
+class QTextEdit(QtWidgets.QTextEdit):
+    """
+    """
+
+    # -------------------------------------------------------------------------
+    def __init__(self, *args, **kwargs):
+        super(QTextEdit, self).__init__(*args, **kwargs)
+        self._placeholderText = ''
+        self._placeholderVisible = False
+        self.textChanged.connect(self.placeholderVisible)
+
+    # -------------------------------------------------------------------------
+    def placeholderVisible(self):
+        """Return if the placeholder text is visible,
+        and force update if required.
+
+        """
+        placeholderCurrentlyVisible = self._placeholderVisible
+        self._placeholderVisible = self._placeholderText and self.document().isEmpty() and not self.hasFocus()
+        if self._placeholderVisible != placeholderCurrentlyVisible:
+            self.viewport().update()
+        return self._placeholderVisible
+
+    # -------------------------------------------------------------------------
+    def placeholderText(self):
+        """Return text used as a placeholder.
+
+        """
+        return self._placeholderText
+
+    # -------------------------------------------------------------------------
+    def setPlaceholderText(self, text):
+        """Set text to use as a placeholder.
+
+        """
+        self._placeholderText = text
+        if self.document().isEmpty():
+            self.viewport().update()
+
+    # -------------------------------------------------------------------------
+    def paintEvent(self, event):
+        """Override the paint event to add the placeholder text.
+
+        """
+        if self.placeholderVisible():
+            painter = QtGui.QPainter(self.viewport())
+            colour = self.palette().text().color()
+            colour.setAlpha(128)
+            painter.setPen(colour)
+            painter.setClipRect(self.rect())
+            margin = self.document().documentMargin()
+            textRect = self.viewport().rect().adjusted(margin, margin, 0, 0)
+            painter.drawText(textRect, QtCore.Qt.AlignTop | QtCore.Qt.TextWordWrap, self.placeholderText())
+        super(QTextEdit, self).paintEvent(event)
