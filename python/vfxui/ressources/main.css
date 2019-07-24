@@ -97,7 +97,7 @@ QGroupBox  {
     margin:8px 0px 4px 0px;
     padding:13px 10px 10px 10px;
 
-    font-size:12px;
+    /*font-size:12px;*/
 
     border:1px solid #333333;
     border-radius:5px;

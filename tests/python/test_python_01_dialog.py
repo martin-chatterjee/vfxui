@@ -593,6 +593,11 @@ class UI_Dialog_Test(TestCase):
         val = dialog.getWidgetValue('multiline_text')
         self.assertEqual(val, 'Foo man Choo')
 
+        mlt = dialog.getWidget('multiline_text')
+        self.assertEqual(mlt.placeholderText(), 'Enter Name')
+        mlt.setPlaceholderText('')
+        self.assertEqual(mlt.placeholderText(), '')
+
         val = dialog.getWidgetValue('spinBox')
         self.assertEqual(val, 13)
 
@@ -1005,6 +1010,28 @@ class UI_Dialog_Test(TestCase):
 
         dialog.close()
         dialog = None
+
+
+    # -------------------------------------------------------------------------
+    def test40_multiline_TextBox_placeholder(self):
+
+        dialog = createDialog(width=400, height=300)
+        mltb = dialog.addTextBox(multiline=True, placeholder='placeholder')
+        tb = dialog.addTextBox(multiline=False)
+        dialog.setFocus(tb)
+        dialog.show()
+
+        self.assertEqual(mltb.placeholderText(), 'placeholder')
+        time.sleep(1)
+        dialog.redraw()
+        mltb.setPlaceholderText('New Text')
+        self.assertEqual(mltb.placeholderText(), 'New Text')
+        time.sleep(1)
+        dialog.redraw()
+
+        dialog.close()
+        dialog = None
+
     # -------------------------------------------------------------------------
     def test92_contextNuke(self):
 

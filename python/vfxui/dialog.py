@@ -692,7 +692,7 @@ class Dialog(QtWidgets.QDialog):
         with Guard():
             if type(widget) == QtWidgets.QLineEdit:
                 value = widget.text()
-            elif type(widget) == QtWidgets.QTextEdit:
+            elif type(widget) in [QtWidgets.QTextEdit, QTextEdit]:
                 value = widget.toPlainText()
             elif type(widget) == QtWidgets.QComboBox:
                 value = (widget.currentIndex(), widget.currentText())
@@ -1282,7 +1282,6 @@ class Dialog(QtWidgets.QDialog):
 
         if icon_path is not None:
             icon_path = self.conformPath(icon_path)
-            print('>WTF {}'.format(icon_path))
             if os.path.exists(icon_path):
                 icon = QtGui.QIcon()
                 pixmap = QtGui.QPixmap(icon_path)
@@ -2070,7 +2069,6 @@ class Dialog(QtWidgets.QDialog):
                 widget.setFont(custom_font)
 
         if 'font_size' in kwargs:
-            print('WTF {}'.format(kwargs['font_size']))
             with Guard():
                 font_size = int(kwargs['font_size'])
                 font = widget.font()
@@ -2472,6 +2470,7 @@ class QTextEdit(QtWidgets.QTextEdit):
 
         """
         self._placeholderText = text
+        print('>> {}'.format(self._placeholderText))
         if self.document().isEmpty():
             self.viewport().update()
 

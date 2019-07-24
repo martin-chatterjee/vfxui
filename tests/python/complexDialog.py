@@ -91,11 +91,13 @@ class ComplexDialog(Dialog):
                                 value='Fritz Lakritz',
                                 min_height=50,
                                 width=300,
+                                placeholder='placeholder',
                                 expression='^[_a-zA-Z0-9]*$')
         multilinetextbox = self.addTextBox(
                                 widget_id='multiline_text',
                                 multiline=True,
                                 label='enter Name:',
+                                placeholder='Enter Name',
                                 value='Foo man Choo',
                                 min_height=50,
                                 width=300)
