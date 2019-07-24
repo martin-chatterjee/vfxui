@@ -2470,7 +2470,6 @@ class QTextEdit(QtWidgets.QTextEdit):
 
         """
         self._placeholderText = text
-        print('>> {}'.format(self._placeholderText))
         if self.document().isEmpty():
             self.viewport().update()
 
