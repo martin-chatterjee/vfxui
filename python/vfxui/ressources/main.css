@@ -44,8 +44,8 @@ QSpacerItem {
 
 QLineEdit {
     background-color:#2b2b2b;
-    /*padding: 1px 0px;*/
-    padding: 1px 0px 1px 10px;
+    /*padding: 1px 0px 1px 10px;*/
+    padding: 1px 0px 1px 2px;
 
     border: 1px solid #5d5d5d;
     border: 1px solid #545353;
@@ -104,32 +104,35 @@ QGroupBox  {
     font-weight:bold;
 }
 
-[labelClass="less_prominent"] {
+QGroupBox[labelClass="less_prominent"] {
     color:#858585;
 }
 
-[labelClass="no_frame"] {
-    border:None;
-}
-
-[labelClass="no_frame_no_label"] {
-    border:None;
+QGroupBox[labelClass="no_frame"] {
     margin:0px;
     padding:0px;
+    border:None;
 }
 
-[labelClass="no_frame_no_label_less_prominent"] {
-    border:None;
+QGroupBox[labelClass="no_frame_no_label"] {
     margin:0px;
     padding:0px;
-    color:#858585;
+    border:None;
 }
 
-[labelClass="no_frame_less_prominent"] {
+QGroupBox[labelClass="no_frame_no_label_less_prominent"] {
+    margin:0px;
+    padding:0px;
     border:None;
     color:#858585;
 }
 
+QGroupBox[labelClass="no_frame_less_prominent"] {
+    margin:0px;
+    padding:0px;
+    border:None;
+    color:#858585;
+}
 
 
 QGroupBox::title {
@@ -318,18 +321,23 @@ QListWidget {
 }
 
 QListWidget::item {
-    padding: 5px 20px;
+    /*padding: 5px 20px;*/
+    padding: 2px 10px;
+    margin:0px;
     border-top: 1px solid #393939;
+
 }
 
 QListWidget::item QLabel {
-    padding: 0px 5px;
+    /*padding: 0px 5px;*/
+    padding: 0px;
+    margin:0px;
     background-color: None;
 }
 
 QListWidget::item ListRow  {
-    padding: 0px 5px;
-
+    /*padding: 0px 5px;*/
+    padding: 0px;
     margin:0px;
     background-color: None;
 }
@@ -338,7 +346,8 @@ QListWidget::item ListRow QPushButton {
 }
 
 QListWidget::item ListRow QLabel {
-    padding: 0px 5px;
+    /*padding: 0px 5px;*/
+    padding: 0px;
     margin: 0px;
     border: 0px;
     background-color: None;
