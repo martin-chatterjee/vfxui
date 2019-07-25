@@ -168,7 +168,7 @@ class ListBox(QtWidgets.QWidget):
 
     # -------------------------------------------------------------------------
     def __init__(self,
-                 row_height=35,
+                 row_height=25,
                  filter_row_height=35,
                  multiselect=False,
                  filtering=False,

@@ -1001,7 +1001,7 @@ class Dialog(QtWidgets.QDialog):
                    multiselect=False,
                    selection_controls=False,
                    selection_control_position='left',
-                   row_height=35,
+                   row_height=25,
                    filter_row_height=35,
                    content=[],
                    **kwargs):
