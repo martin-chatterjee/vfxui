@@ -154,8 +154,16 @@ class ListBox(QtWidgets.QWidget):
     """
     keyPressed = QtCore.Signal(QtGui.QKeyEvent)
 
-    itemActivated = QtCore.Signal()
-    itemClicked = QtCore.Signal()
+    itemActivated = QtCore.Signal(QtWidgets.QListWidgetItem)
+    itemClicked = QtCore.Signal(QtWidgets.QListWidgetItem)
+    currentItemChanged = QtCore.Signal(QtWidgets.QListWidgetItem, QtWidgets.QListWidgetItem)
+    currentRowChanged = QtCore.Signal(int)
+    currentTextChanged = QtCore.Signal(str)
+    itemChanged = QtCore.Signal(QtWidgets.QListWidgetItem)
+    itemDoubleClicked = QtCore.Signal(QtWidgets.QListWidgetItem)
+    itemEntered = QtCore.Signal(QtWidgets.QListWidgetItem)
+    itemPressed = QtCore.Signal(QtWidgets.QListWidgetItem)
+    itemSelectionChanged = QtCore.Signal()
 
     filterChanged = QtCore.Signal()
     filterTabPressed = QtCore.Signal()
@@ -249,6 +257,18 @@ class ListBox(QtWidgets.QWidget):
                         QtWidgets.QAbstractItemView.ExtendedSelection)
         self.list.itemActivated.connect(self.slot_list_itemActivated)
         self.list.itemClicked.connect(self.slot_list_itemClicked)
+        self.list.currentItemChanged.connect(self.slot_list_currentItemChanged)
+        self.list.currentRowChanged.connect(self.slot_list_currentRowChanged)
+        self.list.currentTextChanged.connect(self.slot_list_currentTextChanged)
+        self.list.itemChanged.connect(self.slot_list_itemChanged)
+        self.list.itemDoubleClicked.connect(self.slot_list_itemDoubleClicked)
+        self.list.itemEntered.connect(self.slot_list_itemEntered)
+        self.list.itemPressed.connect(self.slot_list_itemPressed)
+        self.list.itemSelectionChanged.connect(self.slot_list_itemSelectionChanged)
+
+
+
+
 
         # prepare layout
         self.layout = QtWidgets.QVBoxLayout()
@@ -346,12 +366,44 @@ class ListBox(QtWidgets.QWidget):
         self.selectInvert.emit()
 
     # -------------------------------------------------------------------------
-    def slot_list_itemActivated(self):
-        self.itemActivated.emit()
+    def slot_list_itemActivated(self, item):
+        self.itemActivated.emit(item)
 
     # -------------------------------------------------------------------------
-    def slot_list_itemClicked(self):
-        self.itemClicked.emit()
+    def slot_list_itemClicked(self, item):
+        self.itemClicked.emit(item)
+
+    # -------------------------------------------------------------------------
+    def slot_list_currentItemChanged(self, current, previous):
+        self.currentItemChanged.emit(current, previous)
+
+    # -------------------------------------------------------------------------
+    def slot_list_currentRowChanged(self, currentRow):
+        self.currentRowChanged.emit(currentRow)
+
+    # -------------------------------------------------------------------------
+    def slot_list_currentTextChanged(self, item):
+        self.currentTextChanged.emit(item)
+
+    # -------------------------------------------------------------------------
+    def slot_list_itemChanged(self, item):
+        self.itemChanged.emit(item)
+
+    # -------------------------------------------------------------------------
+    def slot_list_itemDoubleClicked(self, item):
+        self.itemDoubleClicked.emit(item)
+
+    # -------------------------------------------------------------------------
+    def slot_list_itemEntered(self, item):
+        self.itemEntered.emit(item)
+
+    # -------------------------------------------------------------------------
+    def slot_list_itemPressed(self, item):
+        self.itemPressed.emit(item)
+
+    # -------------------------------------------------------------------------
+    def slot_list_itemSelectionChanged(self):
+        self.itemSelectionChanged.emit()
 
     # -------------------------------------------------------------------------
     def slot_filter_line_textChanged(self):

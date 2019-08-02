@@ -125,7 +125,12 @@ class ListBox_Test(TestCase):
         dlg.redraw()
         time.sleep(self.time_between_emits)
 
+        # we should probably test those properly in the future...
         lb.list.itemClicked.emit(lb.item(0))
+        lb.list.itemDoubleClicked.emit(lb.item(1))
+        lb.list.itemPressed.emit(lb.item(1))
+        lb.list.itemEntered.emit(lb.item(1))
+        lb.list.itemChanged.emit(lb.item(1))
 
 
         dlg.close()
