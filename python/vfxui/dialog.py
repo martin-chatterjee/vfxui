@@ -939,7 +939,6 @@ class Dialog(QtWidgets.QDialog):
         self._getActiveLayout().addWidget(widget)
 
         if label is not None:
-            self.addStretch()
             self.closeRow()
             self.closeGroup()
 
