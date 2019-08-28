@@ -183,6 +183,7 @@ class ListBox(QtWidgets.QWidget):
                  selection_controls=False,
                  selection_control_position='left',
                  placeholder='Search',
+                 select_first_filtered=False,
                  **kwargs):
         """
         """
@@ -198,7 +199,7 @@ class ListBox(QtWidgets.QWidget):
         self.selection_controls = selection_controls
         self.selection_control_position = selection_control_position
         self.placeholder = placeholder
-
+        self.select_first_filtered = select_first_filtered
         if self.filter_row_height < 35:
             self.filter_row_height = 35
         if not self.multiselect:
@@ -454,13 +455,14 @@ class ListBox(QtWidgets.QWidget):
             if exclude_row:
                 row.setHidden(True)
 
-        if len(filter_tokens) > 0:
-            # auto-select first entry
-            for i in range(self.list.count()):
-                row = self.list.item(i)
-                if row.isHidden() is False:
-                    row.setSelected(True)
-                    break
+        if self.select_first_filtered:
+            if len(filter_tokens) > 0:
+                # auto-select first entry
+                for i in range(self.list.count()):
+                    row = self.list.item(i)
+                    if row.isHidden() is False:
+                        row.setSelected(True)
+                        break
 
     # -------------------------------------------------------------------------
     @property
