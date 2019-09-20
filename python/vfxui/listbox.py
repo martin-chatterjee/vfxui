@@ -312,6 +312,24 @@ class ListBox(QtWidgets.QWidget):
 
 
     # -------------------------------------------------------------------------
+    def hideRow(self, row_index):
+        """
+        """
+        item = self.list.item(row_index)
+        item.setHidden(True)
+        item.visible = False
+
+    # -------------------------------------------------------------------------
+    def showRow(self, row_index):
+        """
+        """
+        item = self.list.item(row_index)
+        item.setHidden(False)
+        item.visible = True
+
+
+
+    # -------------------------------------------------------------------------
     def _addControlsToLayout(self, layout):
         """
         """
@@ -434,9 +452,10 @@ class ListBox(QtWidgets.QWidget):
     # -------------------------------------------------------------------------
     def filterRows(self):
         filter_tokens = self.filter.getFilterTokens()
-
         for i in range(self.list.count()):
             row = self.list.item(i)
+            if row.visible is False:
+                continue
             row.setHidden(False)
             row.setSelected(False)
 
@@ -527,7 +546,7 @@ class ListBox(QtWidgets.QWidget):
         item = ListWidgetItem(value=item,
                               index=self.count(),
                               **self._kwargs)
-
+        item.visible = True
         size_hint = QtCore.QSize(-1, self.row_height)
         item.setSizeHint(size_hint)
 
