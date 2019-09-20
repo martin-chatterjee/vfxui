@@ -24,6 +24,7 @@ class FileBrowser(QtWidgets.QWidget):
                  label='',
                  dialog_caption='',
                  show_text=True,
+                 direct_edit=False,
                  button_label='...',
                  mode='open',
                  filters=[],
@@ -31,7 +32,11 @@ class FileBrowser(QtWidgets.QWidget):
                  selected_file=''):
         """
         """
+
         super(FileBrowser, self).__init__()
+
+        self.__targetfolder = ''
+        self.__targetfile = ''
 
         # store settings
         self.mode = mode
@@ -42,6 +47,8 @@ class FileBrowser(QtWidgets.QWidget):
         self.initialdir = initialdir
         if os.path.exists(self.initialdir) == False:
             self.initialdir = 'C:/Temp'
+        if mode == 'folder':
+            self.__targetfolder = self.initialdir
 
         self.selected_file = selected_file
 
@@ -55,16 +62,7 @@ class FileBrowser(QtWidgets.QWidget):
         if default_filter not in self.filters:
             self.filters.append(default_filter)
 
-        self.filebrowser = QtWidgets.QFileDialog(
-                                        self,
-                                        caption=self.dialog_caption,
-                                        directory=self.initialdir)
-        self.filebrowser.setNameFilters(self.filters)
-        if self.selected_file != '':
-            self.filebrowser.selectFile(self.selected_file)
-
-        self.__targetfolder = ''
-        self.__targetfile = ''
+        self.__filebrowser = None
 
         # deal with layout
         self.layout = QtWidgets.QHBoxLayout()
@@ -83,21 +81,39 @@ class FileBrowser(QtWidgets.QWidget):
             activeLayout = self.groupLayout
 
         self.text = QtWidgets.QLineEdit()
-        self.text.setEnabled(False)
+        if direct_edit is False:
+            self.text.setEnabled(False)
         self.text.setToolTip(self.dialog_caption)
+        self.text.setText(self.targetfilepath)
+        self.text.editingFinished.connect(self.slot_text_editingFinished)
 
         self.button = QtWidgets.QPushButton(button_label)
-        # self.button.setFixedWidth(50)
+        self.button.setFixedWidth(100)
         self.button.setToolTip(self.dialog_caption)
 
         if show_text == True:
             activeLayout.addWidget(self.text)
+            activeLayout.addSpacing(5)
         activeLayout.addWidget(self.button)
 
         self.setLayout(self.layout)
 
         # connect button to slot
         self.button.clicked.connect(self.slot_released)
+
+    # -------------------------------------------------------------------------
+    @property
+    def filebrowser(self):
+        if self.__filebrowser is None:
+            self.__filebrowser = QtWidgets.QFileDialog(
+                                            self,
+                                            caption=self.dialog_caption,
+                                            directory=self.initialdir)
+            self.__filebrowser.setNameFilters(self.filters)
+            if self.selected_file != '':
+                self.__filebrowser.selectFile(self.selected_file)
+
+        return self.__filebrowser
 
     # -------------------------------------------------------------------------
     @property
@@ -118,7 +134,10 @@ class FileBrowser(QtWidgets.QWidget):
     def targetfilepath(self):
         """
         """
-        return '%s/%s' % (self.targetfolder, self.targetfile)
+        tfp = '%s/%s' % (self.targetfolder, self.targetfile)
+        if tfp.endswith('/'):
+            tfp = tfp[:-1]
+        return tfp
 
     # -------------------------------------------------------------------------
     def showDialog(self, test_mode=None):
@@ -177,9 +196,9 @@ class FileBrowser(QtWidgets.QWidget):
             else:
                 self.__targetfolder = os.path.dirname(path)
                 self.__targetfile = os.path.basename(path)
-        else:
-            self.__targetfolder = ''
-            self.__targetfile = ''
+        # else:
+        #     self.__targetfolder = ''
+        #     self.__targetfile = ''
 
         self._updateText()
 
@@ -200,3 +219,32 @@ class FileBrowser(QtWidgets.QWidget):
         self.showDialog(**kwargs)
         self.clicked.emit()
 
+    # -------------------------------------------------------------------------
+    def slot_text_editingFinished(self, **kwargs):
+        """
+        """
+        value = self.text.text()
+        value = value.strip().replace(' ', '/').replace('\\', '/')
+        if value.endswith('/'):
+            value = value[:-1]
+        while len(value) > 0 and not os.path.exists(value):
+            tokens = value.split('/')
+            value = '/'.join(tokens[:-1])
+
+        self.text.setText(value)
+        self.__targetfolder = value
+        self.button.setFocus(QtCore.Qt.TabFocusReason)
+
+
+    # -------------------------------------------------------------------------
+    def setFixedHeight(self, height):
+        self.text.setFixedHeight(height)
+        self.button.setFixedHeight(height)
+
+    # -------------------------------------------------------------------------
+    def font(self):
+        return self.text.font()
+
+    # -------------------------------------------------------------------------
+    def setFont(self, font):
+        self.text.setFont(font)

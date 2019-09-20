@@ -979,6 +979,8 @@ class Dialog(QtWidgets.QDialog):
                        filters=[],
                        selected_file='',
                        label='',
+                       height=35,
+                       direct_edit=False,
                        **kwargs):
         """Adds a File Browser widget.
 
@@ -1009,8 +1011,10 @@ class Dialog(QtWidgets.QDialog):
                              initialdir=initialdir,
                              selected_file=selected_file,
                              dialog_caption=dialog_caption,
-                             filters=filters)
+                             filters=filters,
+                             direct_edit=direct_edit)
 
+        kwargs['height'] = height
         self._processKwargs(widget, kwargs)
 
         # store widget
@@ -1117,6 +1121,8 @@ class Dialog(QtWidgets.QDialog):
             self.openGroup(frame=False)
             self.openRow()
             label = QtWidgets.QLabel(label)
+            self._processKwargs(label, kwargs)
+
             if label_width is not None:
                 label.setFixedWidth(label_width)
             self._getActiveLayout().addWidget(label)
@@ -1126,7 +1132,7 @@ class Dialog(QtWidgets.QDialog):
         self._getActiveLayout().addWidget(widget)
 
         if label is not None:
-            self.addStretch()
+            # self.addStretch()
             self.closeRow()
             self.closeGroup()
 

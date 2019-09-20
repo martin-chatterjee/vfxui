@@ -409,6 +409,7 @@ QScrollArea {
 }
 
 
+
 FilterLine ImageLabel[labelClass='searchIcon'] {
     background-color:#2b2b2b;
     padding: 1px 0px;
@@ -461,3 +462,11 @@ ListBox QLabel[labelClass="labelSelect"] {
 
 }
 
+
+FileBrowser QLineEdit {
+    /*height: 30px;*/
+}
+
+FileBrowser QPushButton {
+    /*height: 30px;*/
+}
