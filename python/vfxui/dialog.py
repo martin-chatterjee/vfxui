@@ -554,7 +554,7 @@ class Dialog(QtWidgets.QDialog):
 
         """
         widget = QtWidgets.QWidget()
-        layout = WrappedRowLayout()
+        layout = WrappedRowLayout(**kwargs)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
@@ -2523,7 +2523,7 @@ class QTextEdit(QtWidgets.QTextEdit):
 
 
 class WrappedRowLayout(QtWidgets.QLayout):
-    def __init__(self, parent=None, margin=-1, hspacing=-1, vspacing=-1):
+    def __init__(self, parent=None, margin=-1, hspacing=-1, vspacing=-1, **kwargs):
         super(WrappedRowLayout, self).__init__(parent)
         self._hspacing = hspacing
         self._vspacing = vspacing
@@ -2537,12 +2537,9 @@ class WrappedRowLayout(QtWidgets.QLayout):
         self._items.append(item)
 
     def addSpacing(self, dim):
-        print('>>> {}'.format(dim))
         spacer = QtWidgets.QWidget()
         spacer.setFixedWidth(dim)
         self.addWidget(spacer)
-        # super(QtWidgets.QLayout, self).setSpacing(dim)
-        # self._items.append(item)
 
     def horizontalSpacing(self):
         if self._hspacing >= 0:

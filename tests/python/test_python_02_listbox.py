@@ -30,7 +30,7 @@ class ListBox_Test(TestCase):
 
         basepath = os.path.dirname(__file__).replace('\\', '/')
 
-        cls.display_length = 1000
+        cls.display_length = 100
         cls.time_between_emits = .1
         cls.delay = 20
 
@@ -58,7 +58,8 @@ class ListBox_Test(TestCase):
                             multiselect=True,
                             selection_controls=True,
                             selection_control_position='invalid',
-                            placeholder='Search here')
+                            placeholder='Search here',
+                            select_first_filtered=True)
         lb.addItems(['foo', 'fizz', 'buzz'])
 
         dlg.show()
@@ -345,7 +346,7 @@ class ListBox_Test(TestCase):
                             font_spacing=0.1,
                             )
 
-        custom_row = ListRow(value='Boooooo', tooltip='Awesome Tip', keywords='foobar')
+        custom_row = ListRow(value='Boooooo', tooltip='Awesome Tip', keywords=['foobar'])
         lb.addItem(custom_row)
         dlg.show()
         self.assertEqual(lb.count(), 1)
@@ -358,6 +359,56 @@ class ListBox_Test(TestCase):
 
         self.assertEqual(custom_row.listbox, lb)
         self.assertEqual(str(custom_row.listrow), str(lb.item(0)))
+
+        dlg.close()
+        dlg = None
+
+    # -------------------------------------------------------------------------
+    def test09_listbox_hideRow_showRow(self):
+
+        dlg = createDialog(width=400,
+                           height=800,
+                           test_display_length=self.display_length)
+
+
+        lb = dlg.addListBox(filtering=True,
+                            multiselect=False,
+                            filter_row_height=20,
+                            selection_controls=True,
+                            selection_control_position='inline',
+                            min_height=200
+                            )
+        content = []
+        content.append("this is line A")
+        content.append("--- I'm hidden... A ---")
+        content.append("ladiladi")
+        content.append("--- I'm another hidden line. ---")
+        lb.addItems(content)
+        lb.hideRow(1)
+        lb.hideRow(3)
+        dlg.show()
+        self.assertEqual(lb.count(), 4)
+        self.assertEqual(len(lb.visibleItems()), 2)
+
+        lb.filter.setText('line')
+        dlg.redraw()
+        time.sleep(1)
+        self.assertEqual(len(lb.visibleItems()), 1)
+
+        lb.filter.setText('')
+        dlg.redraw()
+        time.sleep(1)
+        self.assertEqual(len(lb.visibleItems()), 2)
+
+        lb.showRow(3)
+        dlg.redraw()
+        time.sleep(1)
+        self.assertEqual(len(lb.visibleItems()), 3)
+
+        lb.filter.setText('line')
+        dlg.redraw()
+        time.sleep(1)
+        self.assertEqual(len(lb.visibleItems()), 2)
 
         dlg.close()
         dlg = None

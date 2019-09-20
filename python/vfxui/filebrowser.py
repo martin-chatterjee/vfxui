@@ -196,9 +196,9 @@ class FileBrowser(QtWidgets.QWidget):
             else:
                 self.__targetfolder = os.path.dirname(path)
                 self.__targetfile = os.path.basename(path)
-        # else:
-        #     self.__targetfolder = ''
-        #     self.__targetfile = ''
+        else:
+            self.__targetfolder = ''
+            self.__targetfile = ''
 
         self._updateText()
 
