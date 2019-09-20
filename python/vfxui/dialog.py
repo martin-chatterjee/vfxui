@@ -2279,13 +2279,15 @@ class ListRow(Dialog):
     is_list_row = True
 
     # -------------------------------------------------------------------------
-    def initialize(self, value=None, index=0, keywords='', **kwargs):
+    def initialize(self, value=None, index=0, **kwargs):
         """
         """
         self.kwargs = kwargs
         self.value = value
         self.index = index
-        self.keywords = keywords
+        self.keywords = []
+        if 'keywords' in kwargs:
+            self.keywords = kwargs['keywords']
         self.is_child_widget = True
         self.add_last_stretch = False
         self._layout_main.setContentsMargins(0, 0, 0, 0)
@@ -2306,7 +2308,7 @@ class ListRow(Dialog):
     # -------------------------------------------------------------------------
     @property
     def filter_keywords(self):
-        return '{} {}'.format(self.value, self.keywords).lower()
+        return '{} {}'.format(self.value, ' '.join(self.keywords).lower())
 
     # -------------------------------------------------------------------------
     def defineLeftLayout(self):
