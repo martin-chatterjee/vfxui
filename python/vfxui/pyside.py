@@ -9,7 +9,7 @@ QtCore = None
 QtGui = None
 QtWidgets = None
 QtTest = None
-
+is_pyside2 = True
 try:
     import PySide2.QtCore as PS2_QtCore
     QtCore = PS2_QtCore
@@ -21,6 +21,7 @@ try:
     QtTest = PS2_QtTest
 
 except ImportError:
+    is_pyside2 = False
     import PySide.QtCore as PS_QtCore
     QtCore = PS_QtCore
     import PySide.QtGui as PS_QtGui

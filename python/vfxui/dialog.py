@@ -791,6 +791,7 @@ class Dialog(QtWidgets.QDialog):
                  widget_id='label',
                  label='',
                  align='left',
+                 valign='center',
                  **kwargs):
         """Adds a label.
 
@@ -799,6 +800,8 @@ class Dialog(QtWidgets.QDialog):
             label (string)          : label for this Label
             align (string)          : align this widget 'left', 'center' or 'right'
                                       Defaults to 'left'
+            valign (string)          : align this widget 'top', 'center' or 'bottom'
+                                      Defaults to 'center'
             kwargs (keyword args)   : optional kwargs processed by _processKwargs()
 
         Returns:
@@ -809,13 +812,21 @@ class Dialog(QtWidgets.QDialog):
         widget_id = None
         widget = QtWidgets.QLabel(label)
         if align == 'center':
-            widget.setAlignment(QtCore.Qt.AlignCenter)
+            h_flag= QtCore.Qt.AlignCenter
         elif align == 'right':
-            widget.setAlignment(QtCore.Qt.AlignRight)
+            h_flag = QtCore.Qt.AlignRight
         else:
             # default to 'left'
-            widget.setAlignment(QtCore.Qt.AlignLeft)
+            h_flag = QtCore.Qt.AlignLeft
+        if valign == 'top':
+            v_flag= QtCore.Qt.AlignTop
+        elif valign == 'bottom':
+            v_flag = QtCore.Qt.AlignBottom
+        else:
+            # default to 'center'
+            v_flag = QtCore.Qt.AlignVCenter
 
+        widget.setAlignment(h_flag | v_flag)
 
         self._processKwargs(widget, kwargs)
 
@@ -2069,33 +2080,34 @@ class Dialog(QtWidgets.QDialog):
     def _dealWithCustomFont(self, widget, kwargs):
         """
         """
-        if 'font' in kwargs:
-            with Guard():
+        with Guard():
+            font = 'MS Sans Serif'
+            if 'font' in kwargs:
                 font = kwargs['font']
-                font_size = 10
-                if 'font_size' in kwargs:
-                    font_size = int(kwargs['font_size'])
-                font_spacing = 0.0
-                if 'font_spacing' in kwargs:
-                    font_spacing = float(kwargs['font_spacing'])
+            font_size = 10
+            if 'font_size' in kwargs:
+                font_size = int(kwargs['font_size'])
+            font_spacing = 0.0
+            if 'font_spacing' in kwargs:
+                font_spacing = float(kwargs['font_spacing'])
 
-                font_weight = QtGui.QFont.Normal
-                if 'font_weight' in kwargs:
-                    value = kwargs['font_weight'].lower()
-                    font_weight_values = {
-                                            'normal' : QtGui.QFont.Normal,
-                                            'light' : QtGui.QFont.Light,
-                                            'demibold' : QtGui.QFont.DemiBold,
-                                            'bold' : QtGui.QFont.Bold,
-                                            'black' : QtGui.QFont.Black
-                                         }
-                    if value in font_weight_values:
-                        font_weight = font_weight_values[value]
-                custom_font = QtGui.QFont(font, font_size)
-                custom_font.setLetterSpacing(QtGui.QFont.AbsoluteSpacing, font_spacing)
-                custom_font.setWordSpacing(font_spacing)
-                custom_font.setWeight(font_weight)
-                widget.setFont(custom_font)
+            font_weight = QtGui.QFont.Normal
+            if 'font_weight' in kwargs:
+                value = kwargs['font_weight'].lower()
+                font_weight_values = {
+                                        'normal' : QtGui.QFont.Normal,
+                                        'light' : QtGui.QFont.Light,
+                                        'demibold' : QtGui.QFont.DemiBold,
+                                        'bold' : QtGui.QFont.Bold,
+                                        'black' : QtGui.QFont.Black
+                                     }
+                if value in font_weight_values:
+                    font_weight = font_weight_values[value]
+            custom_font = QtGui.QFont(font, font_size)
+            custom_font.setLetterSpacing(QtGui.QFont.AbsoluteSpacing, font_spacing)
+            custom_font.setWordSpacing(font_spacing)
+            custom_font.setWeight(font_weight)
+            widget.setFont(custom_font)
 
         if 'font_size' in kwargs:
             with Guard():
