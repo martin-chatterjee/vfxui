@@ -587,10 +587,12 @@ class ListWidgetItem(QtWidgets.QListWidgetItem):
     def __init__(self,
                  value,
                  index,
+                 *args,
                  **kwargs):
         """
         """
-        super(ListWidgetItem, self).__init__()
+        # super(ListWidgetItem, self).__init__()
+        super(ListWidgetItem, self).__init__(*args, **kwargs)
 
         self.value = value
         self.index = index
