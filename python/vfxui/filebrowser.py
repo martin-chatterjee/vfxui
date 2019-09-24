@@ -88,7 +88,7 @@ class FileBrowser(QtWidgets.QWidget):
         self.text.editingFinished.connect(self.slot_text_editingFinished)
 
         self.button = QtWidgets.QPushButton(button_label)
-        self.button.setFixedWidth(100)
+        self.button.setMinimumWidth(100)
         self.button.setToolTip(self.dialog_caption)
 
         if show_text == True:
