@@ -25,7 +25,7 @@ from .divider import Divider
 from .guard import Guard
 
 maya_main_window = None
-try:
+try: # pragma: no cover
     import maya.OpenMayaUI as omui
     from .pyside import shiboken
     ptr = omui.MQtUtil.mainWindow()
@@ -1069,20 +1069,18 @@ class Dialog(QtWidgets.QDialog):
                          **kwargs)
 
 
-        # # prepare rows
-        # rows = []
-        # for index, value in enumerate(content):
-        #     row = value
-        #     # if isinstance(value, ListRow):
-        #     #     row = value
-        #     # else:
-        #     #     row = ListRow(value=value, index=index, **kwargs)
-        #     rows.append(row)
+        # prepare rows
+        rows = []
+        for index, value in enumerate(content):
+            row = value
+            if isinstance(value, ListRow):
+                row = value
+            else:
+                row = ListRow(value=value, index=index, **kwargs)
+            rows.append(row)
+        widget.addItems(rows)
 
-        # widget.addItems(rows)
-
-
-        widget.addItems(content)
+        # widget.addItems(content)
 
         self._processKwargs(widget, kwargs)
 

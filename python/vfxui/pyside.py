@@ -37,6 +37,6 @@ try:
 except ImportError:
     try:
         import shiboken as PS_shiboken
-        shiboken = PS_shiboken
+        shiboken = PS_shiboken # pragma: no cover
     except ImportError:
         pass

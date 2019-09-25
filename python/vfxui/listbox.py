@@ -45,7 +45,7 @@ class FilterLine(QtWidgets.QWidget):
                  **kwargs):
         """
         """
-        super(FilterLine, self).__init__(parent=parent, **kwargs)
+        super(FilterLine, self).__init__(parent=parent)
 
 
         image_search = QtGui.QPixmap(self.conformPath('ressources/search.png'))
@@ -189,7 +189,7 @@ class ListBox(QtWidgets.QWidget):
                  **kwargs):
         """
         """
-        super(ListBox, self).__init__(parent=parent, **kwargs)
+        super(ListBox, self).__init__(parent=parent)
 
         self._kwargs = kwargs
         self.__ignore_keypress = False
@@ -595,7 +595,7 @@ class ListWidgetItem(QtWidgets.QListWidgetItem):
         """
         """
         # super(ListWidgetItem, self).__init__()
-        super(ListWidgetItem, self).__init__(*args, **kwargs)
+        super(ListWidgetItem, self).__init__()
 
         self.value = value
         self.index = index

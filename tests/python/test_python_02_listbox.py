@@ -288,12 +288,14 @@ class ListBox_Test(TestCase):
                            height=800,
                            test_display_length=self.display_length)
 
+        initial_row = ListRow(value='FirstRow', tooltip='Yess')
 
         lb = dlg.addListBox(filtering=False,
                             multiselect=False,
                             filter_row_height=20,
                             selection_controls=True,
                             selection_control_position='inline',
+                            content=[initial_row,],
                             min_height=200,
                             font='Arial',
                             font_size=20,
@@ -309,17 +311,17 @@ class ListBox_Test(TestCase):
         time.sleep(1)
 
         lb.addItem('yeah')
-        self.assertEqual(lb.count(), 4)
+        self.assertEqual(lb.count(), 5)
 
         lb.addItem(QtWidgets.QLabel('fff'))
-        self.assertEqual(lb.count(), 5)
+        self.assertEqual(lb.count(), 6)
 
         custom_row = ListRow(value='Boooooo', tooltip='Awesome Tip')
         lb.addItem(custom_row)
-        self.assertEqual(lb.count(), 6)
-        self.assertEqual(lb.item(5).text(), 'Boooooo')
-        lb.item(5).setText('Aaaargh')
-        self.assertEqual(lb.item(5).text(), 'Aaaargh')
+        self.assertEqual(lb.count(), 7)
+        self.assertEqual(lb.item(6).text(), 'Boooooo')
+        lb.item(6).setText('Aaaargh')
+        self.assertEqual(lb.item(6).text(), 'Aaaargh')
         dlg.redraw()
         time.sleep(1)
 

@@ -12,7 +12,7 @@ import imp
 import vfxui.dialog as dlg
 
 from vfxui.pyside import QtCore, QtGui, QtWidgets, QtTest
-from vfxui.dialog import Dialog, createDialog, ListRow
+from vfxui.dialog import Dialog, createDialog, deleteDialog, ListRow
 from complexDialog import ComplexDialog
 
 from vfxtest import TestCase, mock
@@ -76,6 +76,7 @@ class UI_Dialog_Test(TestCase):
 
         Dialog._context = None
 
+
     # -------------------------------------------------------------------------
     def test02_divider(self):
 
@@ -104,6 +105,7 @@ class UI_Dialog_Test(TestCase):
         ret_val = dialog.showModal()
         self.assertFalse(ret_val)
 
+        deleteDialog(dialog)
         dialog = None
 
     # -------------------------------------------------------------------------
@@ -651,13 +653,17 @@ class UI_Dialog_Test(TestCase):
         label_b = dialog.addLabel(label='center', align='center')
         label_c = dialog.addLabel(label='right', align='right')
         label_d = dialog.addLabel(label='unsupported', align='nope')
+        label_e = dialog.addLabel(label='top', valign='top')
+        label_f = dialog.addLabel(label='bottom', valign='bottom')
 
         dialog.showModal()
 
-        self.assertEqual(int(label_a.alignment()), 1)
+        self.assertEqual(int(label_a.alignment()), 129)
         self.assertEqual(int(label_b.alignment()), 132)
-        self.assertEqual(int(label_c.alignment()), 2)
-        self.assertEqual(int(label_d.alignment()), 1)
+        self.assertEqual(int(label_c.alignment()), 130)
+        self.assertEqual(int(label_d.alignment()), 129)
+        self.assertEqual(int(label_e.alignment()), 33)
+        self.assertEqual(int(label_f.alignment()), 65)
 
         dialog = None
 

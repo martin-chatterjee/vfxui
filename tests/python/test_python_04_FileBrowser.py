@@ -201,7 +201,7 @@ class UI_FileBrowser_Test(TestCase):
         dialog.addSpacer(30)
 
         browser.setFont('Helvetica')
-        self.assertEqual(browser.font().rawName(), 'Helvetica')
+        self.assertEqual(browser.font().family(), 'Helvetica')
 
     # -------------------------------------------------------------------------
     def test05_direct_editing(self):
