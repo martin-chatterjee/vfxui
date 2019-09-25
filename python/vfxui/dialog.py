@@ -1380,7 +1380,6 @@ class Dialog(QtWidgets.QDialog):
                 self.css_data[filepath] = css
                 # invalidate cache
                 self._css = None
-                print('>> loaded css: {}'.format(filepath))
 
     # -------------------------------------------------------------------------
     def _loadFont(self, file_path):
@@ -1402,7 +1401,6 @@ class Dialog(QtWidgets.QDialog):
     @property
     def font_db(self):
         if Dialog._font_db is None:
-            print('Created QFontDatabase() !!!!')
             Dialog._font_db = QtGui.QFontDatabase()
         return Dialog._font_db
 
@@ -2398,7 +2396,7 @@ class ListRow(Dialog):
     # -------------------------------------------------------------------------
     @property
     def filter_keywords(self):
-        return '{} {}'.format(self.value, ' '.join(self.keywords).lower())
+        return '{} {}'.format(self.value.lower(), ' '.join(self.keywords).lower())
 
     # -------------------------------------------------------------------------
     def defineLeftLayout(self):
