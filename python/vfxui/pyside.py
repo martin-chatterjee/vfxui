@@ -10,6 +10,7 @@ QtGui = None
 QtWidgets = None
 QtTest = None
 is_pyside2 = True
+shiboken = None
 try:
     import PySide2.QtCore as PS2_QtCore
     QtCore = PS2_QtCore
@@ -30,3 +31,12 @@ except ImportError:
     import PySide.QtTest as PS_QtTest
     QtTest = PS_QtTest
 
+try:
+    import shiboken2 as PS2_shiboken
+    shiboken = PS2_shiboken
+except ImportError:
+    try:
+        import shiboken as PS_shiboken
+        shiboken = PS_shiboken
+    except ImportError:
+        pass
