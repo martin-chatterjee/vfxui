@@ -2372,6 +2372,12 @@ class ListRow(Dialog):
         """
         self.kwargs = kwargs
         self.value = value
+        # decoding needed in Python 2.x
+        try:
+            self.value = self.value.decode('utf-8')
+        except AttributeError:
+            pass
+
         self.index = index
         self.keywords = []
         if 'keywords' in kwargs:
@@ -2396,7 +2402,7 @@ class ListRow(Dialog):
     # -------------------------------------------------------------------------
     @property
     def filter_keywords(self):
-        return '{} {}'.format(self.value.lower(), ' '.join(self.keywords).lower())
+        return u'{} {}'.format(self.value.lower(), ' '.join(self.keywords).lower())
 
     # -------------------------------------------------------------------------
     def defineLeftLayout(self):
