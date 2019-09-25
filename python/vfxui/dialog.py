@@ -2295,8 +2295,9 @@ class Dialog(QtWidgets.QDialog):
 def deleteDialog(dialog):
     """
     """
-    dialog.setParent(None)
-    del dialog
+    if isinstance(dialog, QtWidgets.QWidget):
+        dialog.setParent(None)
+        del dialog
 
 # ------------------------------------------------------------------------------
 def createDialog(targetclass=None, parent=None, **kwargs):
