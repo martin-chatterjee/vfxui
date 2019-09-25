@@ -41,10 +41,11 @@ class FilterLine(QtWidgets.QWidget):
     def __init__(self,
                  row_height,
                  placeholder='Filter...',
+                 parent=None,
                  **kwargs):
         """
         """
-        super(FilterLine, self).__init__()
+        super(FilterLine, self).__init__(parent=parent, **kwargs)
 
 
         image_search = QtGui.QPixmap(self.conformPath('ressources/search.png'))
@@ -184,10 +185,11 @@ class ListBox(QtWidgets.QWidget):
                  selection_control_position='left',
                  placeholder='Search',
                  select_first_filtered=False,
+                 parent=None,
                  **kwargs):
         """
         """
-        super(ListBox, self).__init__()
+        super(ListBox, self).__init__(parent=parent, **kwargs)
 
         self._kwargs = kwargs
         self.__ignore_keypress = False
@@ -219,6 +221,7 @@ class ListBox(QtWidgets.QWidget):
         if self.filtering is True:
             self.filter = FilterLine(placeholder=self.placeholder,
                                      row_height=self.filter_row_height,
+                                     parent=self,
                                      **kwargs)
             self.filter.filter_line.textChanged.connect(
                                             self.slot_filter_line_textChanged)
