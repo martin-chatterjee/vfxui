@@ -24,6 +24,15 @@ from .listbox import ListBox
 from .divider import Divider
 from .guard import Guard
 
+maya_main_window = None
+try:
+    import maya.OpenMayaUI as omui
+    from .pyside import shiboken
+    ptr = omui.MQtUtil.mainWindow()
+    maya_main_window = shiboken.wrapInstance(long(ptr), QtWidgets.QWidget)
+except:
+    pass
+
 logger = logging.getLogger('vfxui')
 """vfxtest logger"""
 
@@ -71,9 +80,13 @@ class Dialog(QtWidgets.QDialog):
 
     ## handle of the current QApplication handle
     app = None
-    ## count of dialogs in use (only relevant if we manage our own QApplication)
-    count = 0
+
     dialogOpen = QtCore.Signal()
+    _font_db = None
+    _loaded_fonts = []
+    _loaded_css = []
+    _css_data = {}
+    _css = None
 
     _context = None
 
@@ -86,7 +99,7 @@ class Dialog(QtWidgets.QDialog):
             kwargs (optional):     keyword arguments passing property values.
 
         """
-        super(Dialog, self).__init__(parent)
+        super(Dialog, self).__init__(parent=parent)
 
         ## if True the size can not be changed by user.
         self.__fixed_size = False
@@ -168,18 +181,6 @@ class Dialog(QtWidgets.QDialog):
         self._connectSignalsToSlots(self, '')
 
         self.__ui_built = False
-
-        if not self.is_child_widget:
-            Dialog.count += 1
-
-    # -------------------------------------------------------------------------
-    def done(self, r=0):
-        """Keeps track of our global Dialog count and then calls 'QDialog.done'.
-
-        """
-        if not self.is_child_widget:
-            Dialog.count -= 1
-        super(Dialog, self).done(r)
 
     # -------------------------------------------------------------------------
     @property
@@ -1339,51 +1340,119 @@ class Dialog(QtWidgets.QDialog):
         return widget
 
     # -------------------------------------------------------------------------
-    def loadFontsAndCss(self):
-        """Tries to load custom Fonts and CSS for this dialog.
-
+    def _loadCoreCss(self):
         """
+        """
+        cur_dir = os.getcwd()
         main_ressources_path = self.conformPath(os.path.dirname(__file__))
         main_ressources_path = '%s/ressources' % main_ressources_path
-
-        style_sheet = ''
-
         os.chdir(os.path.dirname(main_ressources_path))
 
-        # load core css
+        style_sheet = ''
         css_names = ['main.css', '%s.css' % self.context]
         for name in css_names:
             css_path = '%s/%s' % (main_ressources_path, name)
             if os.path.exists(css_path):
-                with open(css_path, 'r') as css:
-                    data = css.read()
-                    root_path = os.path.dirname(main_ressources_path)
-                    style_sheet += self._makePathsAbsoluteInCss(data,
-                                                                root_path)
+                refpath = os.path.dirname(main_ressources_path).replace('\\', '/')
+                self._loadCss(css_path, refpath=refpath)
 
         # load core fonts
         for item in os.listdir(main_ressources_path):
             path = '%s/%s' % (main_ressources_path, item)
             if item.lower().endswith('ttf') or item.lower().endswith('otf'):
                 if os.path.isfile(path):
-                    QtGui.QFontDatabase.addApplicationFont(path)
+                    loaded = self._loadFont(path)
 
-        # load user css and fonts
+        os.chdir(cur_dir)
+        Dialog._core_css = style_sheet
+
+    # -------------------------------------------------------------------------
+    def _loadCss(self, filepath, refpath):
+        """
+        """
+        # ref_path = os.path.dirname(filepath).replace('\\', '/')
+        if not filepath in self.loaded_css:
+            with open(filepath, 'r') as css:
+                data = css.read()
+                # root_path = os.path.dirname(refpath).replace('\\', '/')
+                css = self._makePathsAbsoluteInCss(data, refpath)
+                self.loaded_css.append(filepath)
+                self.css_data[filepath] = css
+                # invalidate cache
+                self._css = None
+                print('>> loaded css: {}'.format(filepath))
+
+    # -------------------------------------------------------------------------
+    def _loadFont(self, file_path):
+        """
+        """
+        filename = os.path.basename(file_path).lower()
+        if not filename in self.loaded_fonts:
+            self.loaded_fonts.append(filename)
+            self.font_db.addApplicationFont(file_path)
+            return True
+        return False
+
+    # -------------------------------------------------------------------------
+    @property
+    def loaded_fonts(self):
+        return Dialog._loaded_fonts
+
+    # -------------------------------------------------------------------------
+    @property
+    def font_db(self):
+        if Dialog._font_db is None:
+            print('Created QFontDatabase() !!!!')
+            Dialog._font_db = QtGui.QFontDatabase()
+        return Dialog._font_db
+
+    # -------------------------------------------------------------------------
+    @property
+    def loaded_css(self):
+        return Dialog._loaded_css
+
+    # -------------------------------------------------------------------------
+    @property
+    def css_data(self):
+        return Dialog._css_data
+        # if Dialog._loaded_css is None:
+        #     self._loadCoreCss()
+
+    # -------------------------------------------------------------------------
+    @property
+    def css(self):
+        if Dialog._css is None:
+            css = ''
+            for key in self.loaded_css:
+                css += self.css_data[key]
+            Dialog._css = css
+
+        return Dialog._css
+
+    # -------------------------------------------------------------------------
+    def loadFontsAndCss(self):
+        """Tries to load custom Fonts and CSS for this dialog.
+
+        """
+        # load core css and fonts
+        self._loadCoreCss()
+        # style_sheet = self.core_css
+
+        # append user css and load user fonts
         if self.source_dir is not None:
             for item in os.listdir(self.source_dir):
                 path = '%s/%s' % (self.source_dir, item)
+                # deal with font
                 if item.lower().endswith('ttf') or item.lower().endswith('otf'):
                     if os.path.isfile(path):
-                        QtGui.QFontDatabase.addApplicationFont(path)
+                        self._loadFont(path)
+                # deal with css
                 elif item.lower() == '%s.css' % self.source_filename.lower():
                     if os.path.exists(path):
-                        with open(path, 'r') as css:
-                            data = css.read()
-                            style_sheet += self._makePathsAbsoluteInCss(
-                                                                data,
-                                                                self.source_dir)
+                        self._loadCss(path, refpath=self.source_dir)
 
-        self.setStyleSheet(style_sheet)
+        self.setStyleSheet(self.css)
+
 
     # -------------------------------------------------------------------------
     @classmethod
@@ -1497,6 +1566,7 @@ class Dialog(QtWidgets.QDialog):
         for item in self._widgets:
             widget = self._widgets[item]
             widget.setParent(None)
+            widget.deleteLater()
 
         self._widgets = {}
         self._openStructures = []
@@ -2226,6 +2296,13 @@ class Dialog(QtWidgets.QDialog):
             cls.app.exec_()
 
 # ------------------------------------------------------------------------------
+def deleteDialog(dialog):
+    """
+    """
+    dialog.setParent(None)
+    del dialog
+
+# ------------------------------------------------------------------------------
 def createDialog(targetclass=None, parent=None, **kwargs):
     """Creates a Dialog object in the current context.
 
@@ -2256,11 +2333,12 @@ def createDialog(targetclass=None, parent=None, **kwargs):
     if parent is None:
 
         if context == 'maya':
-            for widget in QtWidgets.QApplication.topLevelWidgets():
-                name = widget.objectName()
-                if name == 'MayaWindow':
-                    parent = widget
-                    break
+            parent = maya_main_window
+            # for widget in QtWidgets.QApplication.topLevelWidgets():
+            #     name = widget.objectName()
+            #     if name == 'MayaWindow':
+            #         parent = widget
+            #         break
 
         elif context.startswith('nuke'):
             parent = QtWidgets.QApplication.activeWindow()
