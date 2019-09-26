@@ -99,7 +99,7 @@ class Dialog(QtWidgets.QDialog):
             kwargs (optional):     keyword arguments passing property values.
 
         """
-        super(Dialog, self).__init__(parent=parent)
+        super(Dialog, self).__init__()
 
         ## if True the size can not be changed by user.
         self.__fixed_size = False
@@ -2553,6 +2553,7 @@ def msgBox(parent=None,
                           **kwargs)
 
     status = msgbox.showModal()
+    deleteDialog(msgbox)
 
     return status
 
