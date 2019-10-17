@@ -84,9 +84,7 @@ class Dialog(QtWidgets.QDialog):
     dialogOpen = QtCore.Signal()
     _font_db = None
     _loaded_fonts = []
-    _loaded_css = []
-    _css_data = {}
-    _css = None
+    _core_css = None
 
     _context = None
 
@@ -170,6 +168,8 @@ class Dialog(QtWidgets.QDialog):
         self._widgets = {}
         ## current active layout structures
         self._openStructures = []
+
+        self._css = ''
 
         # deal with optional property values
         self._setPropertiesFromKwargs(**kwargs)
@@ -1348,11 +1348,12 @@ class Dialog(QtWidgets.QDialog):
 
         style_sheet = ''
         css_names = ['main.css', '%s.css' % self.context]
+        css_data = []
         for name in css_names:
             css_path = '%s/%s' % (main_ressources_path, name)
             if os.path.exists(css_path):
                 refpath = os.path.dirname(main_ressources_path).replace('\\', '/')
-                self._loadCss(css_path, refpath=refpath)
+                css_data.append(self._loadCss(css_path, refpath=refpath))
 
         # load core fonts
         for item in os.listdir(main_ressources_path):
@@ -1362,22 +1363,19 @@ class Dialog(QtWidgets.QDialog):
                     loaded = self._loadFont(path)
 
         os.chdir(cur_dir)
-        Dialog._core_css = style_sheet
+        Dialog._core_css = '\n'.join(css_data)
 
     # -------------------------------------------------------------------------
     def _loadCss(self, filepath, refpath):
         """
         """
-        # ref_path = os.path.dirname(filepath).replace('\\', '/')
-        if not filepath in self.loaded_css:
-            with open(filepath, 'r') as css:
-                data = css.read()
-                # root_path = os.path.dirname(refpath).replace('\\', '/')
-                css = self._makePathsAbsoluteInCss(data, refpath)
-                self.loaded_css.append(filepath)
-                self.css_data[filepath] = css
-                # invalidate cache
-                self._css = None
+        css = ''
+
+        with open(filepath, 'r') as css:
+            data = css.read()
+            css = self._makePathsAbsoluteInCss(data, refpath)
+
+        return css
 
     # -------------------------------------------------------------------------
     def _loadFont(self, file_path):
@@ -1404,35 +1402,25 @@ class Dialog(QtWidgets.QDialog):
 
     # -------------------------------------------------------------------------
     @property
-    def loaded_css(self):
-        return Dialog._loaded_css
-
-    # -------------------------------------------------------------------------
-    @property
-    def css_data(self):
-        return Dialog._css_data
-        # if Dialog._loaded_css is None:
-        #     self._loadCoreCss()
-
-    # -------------------------------------------------------------------------
-    @property
     def css(self):
-        if Dialog._css is None:
-            css = ''
-            for key in self.loaded_css:
-                css += self.css_data[key]
-            Dialog._css = css
+        return self._css
 
-        return Dialog._css
+    # -------------------------------------------------------------------------
+    @property
+    def core_css(self):
+        if Dialog._core_css is None:
+            self._loadCoreCss()
+
+        return Dialog._core_css
 
     # -------------------------------------------------------------------------
     def loadFontsAndCss(self):
         """Tries to load custom Fonts and CSS for this dialog.
 
         """
-        # load core css and fonts
-        self._loadCoreCss()
-        # style_sheet = self.core_css
+        css_data = []
+        # lazy-load core css and fonts
+        css_data.append(self.core_css)
 
         # append user css and load user fonts
         if self.source_dir is not None:
@@ -1445,8 +1433,9 @@ class Dialog(QtWidgets.QDialog):
                 # deal with css
                 elif item.lower() == '%s.css' % self.source_filename.lower():
                     if os.path.exists(path):
-                        self._loadCss(path, refpath=self.source_dir)
+                        css_data.append(self._loadCss(path, refpath=self.source_dir))
 
+        self._css = '\n'.join(css_data)
         self.setStyleSheet(self.css)
 
 
