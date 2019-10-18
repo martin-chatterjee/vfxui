@@ -811,7 +811,7 @@ class Dialog(QtWidgets.QDialog):
         """
         result = None
         # widget = QtWidgets.QLabel(label)
-        widget = ClickableLabel(label)
+        widget = QLabel(label)
         if align == 'center':
             h_flag= QtCore.Qt.AlignCenter
         elif align == 'right':
@@ -2548,14 +2548,14 @@ def msgBox(parent=None,
 
 
 # -----------------------------------------------------------------------------
-class ClickableLabel(QtWidgets.QLabel):
+class QLabel(QtWidgets.QLabel):
     """
     """
     labelClicked = QtCore.Signal()
 
     def mousePressEvent(self, event):
         self.labelClicked.emit()
-
+        super(QLabel, self).mousePressEvent(event)
 
 # -----------------------------------------------------------------------------
 class QTextEdit(QtWidgets.QTextEdit):
