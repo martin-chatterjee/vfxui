@@ -909,6 +909,42 @@ class UI_Dialog_Test(TestCase):
         dialog.close()
         dialog = None
 
+
+    # -------------------------------------------------------------------------
+    def test41_clickable_Label(self):
+
+        class TestDialog(Dialog):
+            def initialize(self):
+                pass
+            def defineLayout(self):
+                self.text = self.addTextBox(multiline=False)
+                self.addSpacer(50)
+                self.label = self.addLabel(widget_id='label', label='ClickMe')
+                self.addSpacer(50)
+            def slot_label_labelClicked(self):
+                self.text.setText('clicked')
+
+
+        dialog = createDialog(targetclass=TestDialog)
+
+        dialog.show()
+        dialog.redraw()
+        time.sleep(self.time_between_emits)
+
+        self.assertEqual(dialog.text.text(), '')
+
+        QtTest.QTest.mouseClick(dialog.label,
+                                QtCore.Qt.LeftButton,
+                                pos=QtCore.QPoint(5,5),
+                                delay=self.display_length)
+        dialog.redraw()
+        time.sleep(self.time_between_emits)
+        dialog.close()
+
+        self.assertEqual(dialog.text.text(), 'clicked')
+        dialog = None
+
+
     # -------------------------------------------------------------------------
     def test92_contextNuke(self):
 
