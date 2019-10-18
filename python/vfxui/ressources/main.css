@@ -477,6 +477,18 @@ ListBox QLabel[labelClass="labelSelect"] {
 }
 
 
+ListBox QScrollBar {
+            width:10px;
+}
+ListBox QScrollBar::handle {
+    background-color:#5d5d5d;
+    border:none;
+}
+ListBox QScrollBar::add-page, ListBox QScrollBar::sub-page {
+    background-color: #373737;
+}
+
+
 FileBrowser QLineEdit {
     /*height: 30px;*/
 }
