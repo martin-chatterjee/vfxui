@@ -2097,30 +2097,32 @@ class Dialog(QtWidgets.QDialog):
         self.__last_view_modal = modal
 
     # -------------------------------------------------------------------------
-    def _processKwargs(self, widget, kwargs):
+    @classmethod
+    def _processKwargs(cls, widget, kwargs):
         """Tries to apply all known keyword arguments to widget.
 
         """
-        self.__setKwarg(widget, kwargs, 'height', 'setFixedHeight')
-        self.__setKwarg(widget, kwargs, 'width', 'setFixedWidth')
+        cls.__setKwarg(widget, kwargs, 'height', 'setFixedHeight')
+        cls.__setKwarg(widget, kwargs, 'width', 'setFixedWidth')
 
-        self.__setKwarg(widget, kwargs, 'min_height', 'setMinimumHeight')
-        self.__setKwarg(widget, kwargs, 'min_width', 'setMinimumWidth')
+        cls.__setKwarg(widget, kwargs, 'min_height', 'setMinimumHeight')
+        cls.__setKwarg(widget, kwargs, 'min_width', 'setMinimumWidth')
 
-        self.__setKwarg(widget, kwargs, 'readonly', 'setReadOnly')
-        self.__setKwarg(widget, kwargs, 'enabled', 'setEnabled')
+        cls.__setKwarg(widget, kwargs, 'readonly', 'setReadOnly')
+        cls.__setKwarg(widget, kwargs, 'enabled', 'setEnabled')
 
-        self.__setKwarg(widget, kwargs, 'labelclass', 'setProperty', ['labelClass'])
+        cls.__setKwarg(widget, kwargs, 'labelclass', 'setProperty', ['labelClass'])
 
-        self.__setKwarg(widget, kwargs, 'min', 'setMinimum')
-        self.__setKwarg(widget, kwargs, 'max', 'setMaximum')
+        cls.__setKwarg(widget, kwargs, 'min', 'setMinimum')
+        cls.__setKwarg(widget, kwargs, 'max', 'setMaximum')
 
-        self.__setKwarg(widget, kwargs, 'tooltip', 'setToolTip')
+        cls.__setKwarg(widget, kwargs, 'tooltip', 'setToolTip')
 
-        self._dealWithCustomFont(widget, kwargs)
+        cls._dealWithCustomFont(widget, kwargs)
 
     # -------------------------------------------------------------------------
-    def __setKwarg(self, widget, kwargs, key, method, args=[]):
+    @classmethod
+    def __setKwarg(cls, widget, kwargs, key, method, args=[]):
         """
         """
         if key in kwargs:
@@ -2132,7 +2134,8 @@ class Dialog(QtWidgets.QDialog):
                 call_me(*combined_args)
 
     # -------------------------------------------------------------------------
-    def _dealWithCustomFont(self, widget, kwargs):
+    @classmethod
+    def _dealWithCustomFont(cls, widget, kwargs):
         """
         """
         with Guard():

@@ -64,6 +64,7 @@ class ListBox_Test(TestCase):
 
         dlg.show()
         self.assertEqual(lb.count(), 3)
+        self.assertEqual(lb.count(), len(lb.allItems()))
         self.assertEqual(len(lb.visibleItems()), 3)
         self.assertEqual(len(lb.selectedItems()), 0)
         time.sleep(self.time_between_emits)
