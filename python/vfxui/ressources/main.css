@@ -478,7 +478,7 @@ ListBox QLabel[labelClass="labelSelect"] {
 
 
 ListBox QScrollBar {
-            width:10px;
+    width:10px;
 }
 ListBox QScrollBar::handle {
     background-color:#5d5d5d;
