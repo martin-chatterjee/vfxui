@@ -524,6 +524,16 @@ class ListBox(QtWidgets.QWidget):
         return items
 
     # -------------------------------------------------------------------------
+    def allItems(self):
+        """
+        """
+        items = []
+        for i in range(self.list.count()):
+            item = self.list.item(i)
+            items.append(item)
+        return items
+
+    # -------------------------------------------------------------------------
     def removeItem(self, item):
         """
         """
