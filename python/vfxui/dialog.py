@@ -161,6 +161,8 @@ class Dialog(QtWidgets.QDialog):
 
         self._add_last_stretch = True
 
+        self._delete_later = True
+
         ## main layout
         self._layout_main = QtWidgets.QVBoxLayout()
 
@@ -184,6 +186,17 @@ class Dialog(QtWidgets.QDialog):
 
     # -------------------------------------------------------------------------
     @property
+    def delete_later(self):
+        return self._delete_later
+    @delete_later.setter
+    def delete_later(self, value):
+        if value is True:
+            self._delete_later = True
+        else:
+            self._delete_later = False
+
+    # -------------------------------------------------------------------------
+    @property
     def is_child_widget(self):
         """
         """
@@ -203,6 +216,14 @@ class Dialog(QtWidgets.QDialog):
     @property
     def last_view_modal(self):
         return self.__last_view_modal
+    # -------------------------------------------------------------------------
+    @last_view_modal.setter
+    def last_view_modal(self, value):
+        if value is True:
+            self.__last_view_modal = True
+        else:
+            self.__last_view_modal = False
+
 
     # -------------------------------------------------------------------------
     @property
@@ -395,7 +416,11 @@ class Dialog(QtWidgets.QDialog):
 
         """
         if not self.is_child_widget:
-            self.setWindowFlags(self.windowFlags() | QtCore.Qt.SplashScreen)
+            # self.setWindowFlags(self.windowFlags() | QtCore.Qt.SplashScreen)
+            self.setWindowFlags(self.windowFlags() |
+                                QtCore.Qt.SplashScreen |
+                                QtCore.Qt.WindowStaysOnTopHint)
+
             self.setProperty('labelClass', 'splashscreen')
 
     # -------------------------------------------------------------------------
@@ -1531,14 +1556,17 @@ class Dialog(QtWidgets.QDialog):
             super(Dialog, self).keyPressEvent(event)
 
     # -------------------------------------------------------------------------
-    def close(self, deleteLater=False):
+    def close(self):
         """Closes the open Dialog.
 
         """
         self.__ui_built = False
-        # always clean up for non-modal dialog
-        if deleteLater == True or self.last_view_modal == False:
-            self.deleteLater()
+
+        # only cleanup if needed
+        if self.delete_later is True:
+            if self.last_view_modal is False:
+                self.deleteLater()
+
         super(Dialog, self).close()
 
     # -------------------------------------------------------------------------
@@ -2094,7 +2122,7 @@ class Dialog(QtWidgets.QDialog):
 
         # flag as 'created'
         self.__created = True
-        self.__last_view_modal = modal
+        self.last_view_modal = modal
 
     # -------------------------------------------------------------------------
     @classmethod
