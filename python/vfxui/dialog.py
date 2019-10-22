@@ -416,8 +416,9 @@ class Dialog(QtWidgets.QDialog):
 
         """
         if not self.is_child_widget:
-            self.setWindowFlags(self.windowFlags() | QtCore.Qt.SplashScreen)
-            #                              | QtCore.Qt.WindowStaysOnTopHint)
+            self.setWindowFlags(self.windowFlags()
+                                | QtCore.Qt.SplashScreen
+                                | QtCore.Qt.WindowStaysOnTopHint)
 
             self.setProperty('labelClass', 'splashscreen')
 
@@ -2494,6 +2495,8 @@ class MsgBox(Dialog):
             if kwargs['mode'] == 'warning':
                 self.icon = './ressources/warning.png'
 
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
+
     # -------------------------------------------------------------------------
     def defineLayout(self):
         """
@@ -2537,6 +2540,9 @@ class MsgBox(Dialog):
         self.closeColumn()
         self.addSpacer(10)
         self.addStretch()
+
+
+
 
 
 # -----------------------------------------------------------------------------
