@@ -331,6 +331,14 @@ class ListBox(QtWidgets.QWidget):
         item.visible = True
 
 
+    # -------------------------------------------------------------------------
+    def deselectAll(self):
+        """
+        """
+        for i in range(self.list.count()):
+            item = self.list.item(i)
+            item.setSelected(False)
+
 
     # -------------------------------------------------------------------------
     def _addControlsToLayout(self, layout):
