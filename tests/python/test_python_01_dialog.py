@@ -944,6 +944,17 @@ class UI_Dialog_Test(TestCase):
         self.assertEqual(dialog.text.text(), 'clicked')
         dialog = None
 
+    # -------------------------------------------------------------------------
+    def test42_dialog_delete_late_can_be_get_and_set(self):
+
+        dialog = createDialog()
+        self.assertTrue(dialog.delete_later)
+        dialog.delete_later = False
+        self.assertFalse(dialog.delete_later)
+        dialog.delete_later = True
+        self.assertTrue(dialog.delete_later)
+        dialog.delete_later = 'Nonsense'
+        self.assertFalse(dialog.delete_later)
 
     # -------------------------------------------------------------------------
     def test92_contextNuke(self):
