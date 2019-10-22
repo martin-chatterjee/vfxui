@@ -510,6 +510,8 @@ class ListBox(QtWidgets.QWidget):
         if not self.ignore_keypress:
             self.list.keyPressEvent(event)
 
+        super(ListBox, self).keyPressEvent(event)
+
     # -------------------------------------------------------------------------
     def visibleItems(self):
         """
