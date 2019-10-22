@@ -97,7 +97,7 @@ class Dialog(QtWidgets.QDialog):
             kwargs (optional):     keyword arguments passing property values.
 
         """
-        super(Dialog, self).__init__()
+        super(Dialog, self).__init__(parent=parent)
 
         ## if True the size can not be changed by user.
         self.__fixed_size = False
@@ -143,7 +143,7 @@ class Dialog(QtWidgets.QDialog):
             tdl = kwargs['test_display_length']
             self.test_display_length = tdl
 
-        ## add minimize button
+        # add minimize button
         self.setWindowFlags(self.windowFlags() |
                             QtCore.Qt.WindowMinimizeButtonHint |
                             QtCore.Qt.WindowSystemMenuHint)
@@ -416,10 +416,8 @@ class Dialog(QtWidgets.QDialog):
 
         """
         if not self.is_child_widget:
-            # self.setWindowFlags(self.windowFlags() | QtCore.Qt.SplashScreen)
-            self.setWindowFlags(self.windowFlags() |
-                                QtCore.Qt.SplashScreen |
-                                QtCore.Qt.WindowStaysOnTopHint)
+            self.setWindowFlags(self.windowFlags() | QtCore.Qt.SplashScreen)
+            #                              | QtCore.Qt.WindowStaysOnTopHint)
 
             self.setProperty('labelClass', 'splashscreen')
 
