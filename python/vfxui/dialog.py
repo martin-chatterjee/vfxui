@@ -417,10 +417,19 @@ class Dialog(QtWidgets.QDialog):
         """
         if not self.is_child_widget:
             self.setWindowFlags(self.windowFlags()
-                                | QtCore.Qt.SplashScreen
-                                | QtCore.Qt.WindowStaysOnTopHint)
+                                | QtCore.Qt.SplashScreen)
 
             self.setProperty('labelClass', 'splashscreen')
+
+    # -------------------------------------------------------------------------
+    def setAlwaysOnTop(self):
+        """Flags the current dialog window type to be always on top
+
+        """
+        if not self.is_child_widget:
+            self.setWindowFlags(self.windowFlags()
+                                | QtCore.Qt.WindowStaysOnTopHint)
+
 
     # -------------------------------------------------------------------------
     def addTabsGroup(self, widget_id='tabsgroup'):
