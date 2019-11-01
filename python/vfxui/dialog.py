@@ -82,6 +82,8 @@ class Dialog(QtWidgets.QDialog):
     app = None
 
     dialogOpen = QtCore.Signal()
+    escapePressed = QtCore.Signal()
+    returnPressed = QtCore.Signal()
     _font_db = None
     _loaded_fonts = []
     _core_css = None
@@ -1557,9 +1559,9 @@ class Dialog(QtWidgets.QDialog):
             self.shift = True
             pass # make silent
         elif event.key() == QtCore.Qt.Key_Escape and self.disable_return_escape:
-            pass
+            self.escapePressed.emit()
         elif event.key() == QtCore.Qt.Key_Return and self.disable_return_escape:
-            pass
+            self.returnPressed.emit()
         else:
             super(Dialog, self).keyPressEvent(event)
 

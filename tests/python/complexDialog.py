@@ -18,6 +18,7 @@ class ComplexDialog(Dialog):
         self.width = 500
         self.height = 800
         self.setAsSplashScreen()
+        self.setAlwaysOnTop()
 
 
     # -------------------------------------------------------------------------
