@@ -415,3 +415,24 @@ class ListBox_Test(TestCase):
 
         dlg.close()
         dlg = None
+
+    # -------------------------------------------------------------------------
+    def test10_listbox_filterTokens_respect_all_delimiters(self):
+
+        dlg = createDialog(width=400,
+                           height=800,
+                           test_display_length=self.display_length)
+
+
+        lb = dlg.addListBox(filtering=True,
+                            multiselect=False,
+                            filter_row_height=20,
+                            selection_controls=True,
+                            selection_control_position='inline',
+                            min_height=200
+                            )
+        dlg.show()
+        QTest.keyClicks(lb.filter.filter_line, ' FOO,bar fizz ; buzz ;, ', delay=self.delay)
+        self.assertEqual(lb.getFilterTokens(), ['foo', 'bar', 'fizz', 'buzz'])
+        dlg.close()
+        dlg = None

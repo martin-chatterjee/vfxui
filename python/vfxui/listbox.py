@@ -8,6 +8,7 @@
 ##\brief
 import os
 import sys
+import re
 
 from .pyside import QtCore, QtGui, QtWidgets
 from .imagelabel import ImageLabel
@@ -132,7 +133,8 @@ class FilterLine(QtWidgets.QWidget):
     def getFilterTokens(self):
         """
         """
-        tokens = self.filter_line.text().strip().lower().split(' ')
+        filter_line = self.filter_line.text().strip().lower()
+        tokens = re.split(r'[,; ]', filter_line)
         result = [x for x in tokens if x != '']
         return result
 
