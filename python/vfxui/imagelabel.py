@@ -43,6 +43,7 @@ class ImageLabel(QtWidgets.QLabel):
         """
         if self.image_hi is not None:
             self.setPixmap(self.image_hi)
+        super(ImageLabel, self).enterEvent(event)
 
     # -------------------------------------------------------------------------
     def swapImage(self, image_path):
@@ -77,6 +78,7 @@ class ImageLabel(QtWidgets.QLabel):
         """
         if self.image_hi is not None:
             self.setPixmap(self.image)
+        super(ImageLabel, self).leaveEvent(event)
 
     # -------------------------------------------------------------------------
     def mousePressEvent(self, event):
@@ -84,6 +86,7 @@ class ImageLabel(QtWidgets.QLabel):
         """
         self.setPixmap(self.image)
         self.clicked.emit()
+        super(ImageLabel, self).mousePressEvent(event)
 
     # -------------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
@@ -91,5 +94,6 @@ class ImageLabel(QtWidgets.QLabel):
         """
         if self.image_hi is not None:
             self.setPixmap(self.image_hi)
+        super(ImageLabel, self).mouseReleaseEvent(event)
 
 
