@@ -425,10 +425,21 @@ QScrollArea {
 
 
 
-FilterLine ImageLabel[labelClass='searchIcon'] {
+FilterLine ImageLabel, FilterLine QLineEdit {
     background-color:#2b2b2b;
+}
+FilterLine ImageLabel[labelClass='searchIcon'] {
     padding: 1px 0px;
     border: 1px solid #545353;
+    border-radius:2px;
+    border-right:none;
+    border-top-right-radius: none;
+    border-bottom-right-radius: none;
+}
+FilterLine ImageLabel[labelClass='searchIcon_lessProminent'] {
+    background-color:#3b3b3b;
+    padding: 1px 0px;
+    border: 1px solid #4e4e4e;
     border-radius:2px;
     border-right:none;
     border-top-right-radius: none;
@@ -442,8 +453,14 @@ FilterLine QLineEdit {
     border-radius:none;
 }
 
+[labelClass='lessProminent'] {
+    background-color:#3b3b3b;
+    border-top: 1px solid #4e4e4e;
+    border-bottom: 1px solid #4e4e4e;
+}
+
+
 FilterLine ImageLabel[labelClass='clearIcon'] {
-    background-color:#2b2b2b;
     padding: 1px 0px;
     border: 1px solid #545353;
     border-radius:2px;
@@ -451,6 +468,16 @@ FilterLine ImageLabel[labelClass='clearIcon'] {
     border-top-left-radius: none;
     border-bottom-left-radius: none;
 }
+FilterLine ImageLabel[labelClass='clearIcon_lessProminent'] {
+    background-color:#3b3b3b;
+    padding: 1px 0px;
+    border: 1px solid #4e4e4e;
+    border-radius:2px;
+    border-left:none;
+    border-top-left-radius: none;
+    border-bottom-left-radius: none;
+}
+
 
 
 ListBox QPushButton[labelClass="selectionControl"] {

@@ -42,23 +42,30 @@ class FilterLine(QtWidgets.QWidget):
     def __init__(self,
                  row_height,
                  placeholder='Filter...',
+                 less_prominent=False,
                  parent=None,
                  **kwargs):
         """
         """
         super(FilterLine, self).__init__(parent=parent)
 
+        self.less_prominent = less_prominent
 
         image_search = QtGui.QPixmap(self.conformPath('ressources/search.png'))
         image_clear = QtGui.QPixmap(self.conformPath('ressources/clear.png'))
 
         self.search_icon = ImageLabel(image=image_search)
-        self.search_icon.setProperty('labelClass', 'searchIcon')
         self.search_icon.setFixedHeight(row_height)
+        if self.less_prominent is True:
+            self.search_icon.setProperty('labelClass', 'searchIcon_lessProminent')
+        else:
+            self.search_icon.setProperty('labelClass', 'searchIcon')
 
         self.filter_line = QtWidgets.QLineEdit()
         self.filter_line.setPlaceholderText(placeholder)
         self.filter_line.setFixedHeight(row_height)
+        if self.less_prominent is True:
+            self.filter_line.setProperty('labelClass', 'lessProminent')
 
         self._dealWithCustomFont(self.filter_line, kwargs)
 
@@ -70,6 +77,8 @@ class FilterLine(QtWidgets.QWidget):
 
         self.clear_icon = ImageLabel(image=image_clear)
         self.clear_icon.setProperty('labelClass', 'clearIcon')
+        if self.less_prominent is True:
+            self.clear_icon.setProperty('labelClass', 'clearIcon_lessProminent')
         self.clear_icon.setFixedHeight(row_height)
 
         self.clear_icon.clicked.connect(self.slot_clear_clicked)
@@ -187,6 +196,7 @@ class ListBox(QtWidgets.QWidget):
                  selection_control_position='left',
                  placeholder='Search',
                  select_first_filtered=False,
+                 filter_less_prominent=False,
                  parent=None,
                  **kwargs):
         """
@@ -204,6 +214,7 @@ class ListBox(QtWidgets.QWidget):
         self.selection_control_position = selection_control_position
         self.placeholder = placeholder
         self.select_first_filtered = select_first_filtered
+        self.filter_less_prominent = filter_less_prominent
         if self.filter_row_height < 35:
             self.filter_row_height = 35
         if not self.multiselect:
@@ -223,6 +234,7 @@ class ListBox(QtWidgets.QWidget):
         if self.filtering is True:
             self.filter = FilterLine(placeholder=self.placeholder,
                                      row_height=self.filter_row_height,
+                                     less_prominent=self.filter_less_prominent,
                                      parent=self,
                                      **kwargs)
             self.filter.filter_line.textChanged.connect(

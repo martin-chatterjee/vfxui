@@ -59,7 +59,8 @@ class ListBox_Test(TestCase):
                             selection_controls=True,
                             selection_control_position='invalid',
                             placeholder='Search here',
-                            select_first_filtered=True)
+                            select_first_filtered=True,
+                            filter_less_prominent=True)
         lb.addItems(['foo', 'fizz', 'buzz'])
 
         dlg.show()
