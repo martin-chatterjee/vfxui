@@ -947,6 +947,8 @@ class Dialog(QtWidgets.QDialog):
                    label=None,
                    label_width=None,
                    expression=None,
+                   leave_on_tab=False,
+                   leave_on_ctrl_enter=False,
                    **kwargs):
         """Adds a text box (either one-line or multi-line).
 
@@ -970,7 +972,8 @@ class Dialog(QtWidgets.QDialog):
 
         # create widget
         if multiline:
-            widget = QTextEdit()
+            widget = QTextEdit(leave_on_tab=leave_on_tab,
+                               leave_on_ctrl_enter=leave_on_ctrl_enter)
         else:
             widget = QtWidgets.QLineEdit()
 
@@ -2607,12 +2610,20 @@ class QLabel(QtWidgets.QLabel):
 class QTextEdit(QtWidgets.QTextEdit):
     """
     """
+    leaving = QtCore.Signal()
 
     # -------------------------------------------------------------------------
-    def __init__(self, *args, **kwargs):
-        super(QTextEdit, self).__init__(*args, **kwargs)
+    def __init__(self,
+                 leave_on_tab=False,
+                 leave_on_ctrl_enter=False,
+                 **kwargs):
+        super(QTextEdit, self).__init__(**kwargs)
         self._placeholderText = ''
         self._placeholderVisible = False
+
+        self.leave_on_tab = leave_on_tab
+        self.leave_on_ctrl_enter = leave_on_ctrl_enter
+
         self.textChanged.connect(self.placeholderVisible)
 
     # -------------------------------------------------------------------------
@@ -2642,6 +2653,23 @@ class QTextEdit(QtWidgets.QTextEdit):
         self._placeholderText = text
         if self.document().isEmpty():
             self.viewport().update()
+
+    # -------------------------------------------------------------------------
+    def keyPressEvent(self, event):
+        """
+        """
+        if self.leave_on_tab is True and event.key() == QtCore.Qt.Key_Tab:
+            self.clearFocus()
+            self.leaving.emit()
+            return
+        elif (self.leave_on_ctrl_enter is True
+                  and event.key() == QtCore.Qt.Key_Return
+                  and event.modifiers() == QtCore.Qt.ControlModifier):
+            self.clearFocus()
+            self.leaving.emit()
+            return
+        else:
+            super(QTextEdit, self).keyPressEvent(event)
 
     # -------------------------------------------------------------------------
     def paintEvent(self, event):

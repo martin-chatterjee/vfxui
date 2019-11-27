@@ -17,6 +17,9 @@ from complexDialog import ComplexDialog
 
 from vfxtest import TestCase, mock
 
+QTest = QtTest.QTest
+
+
 # =============================================================================
 class UI_Dialog_Test(TestCase):
     """
@@ -32,6 +35,7 @@ class UI_Dialog_Test(TestCase):
 
         cls.display_length = 100
         cls.time_between_emits = .1
+        cls.delay = 20
 
 
     # -------------------------------------------------------------------------
@@ -955,6 +959,57 @@ class UI_Dialog_Test(TestCase):
         self.assertTrue(dialog.delete_later)
         dialog.delete_later = 'Nonsense'
         self.assertFalse(dialog.delete_later)
+
+    # -------------------------------------------------------------------------
+    def test43_multiline_TextBox_leave_on_tab(self):
+
+        dialog = createDialog(width=400, height=300)
+        mltb = dialog.addTextBox(multiline=True, leave_on_tab=True)
+        dialog.setFocus(mltb)
+        dialog.show()
+
+        QTest.keyClicks(mltb, 'abc\t', delay=self.delay)
+        self.assertFalse(mltb.hasFocus())
+
+        dialog.close()
+        dialog = None
+
+        dialog = createDialog(width=400, height=300)
+        mltb = dialog.addTextBox(multiline=True, leave_on_tab=False)
+        dialog.setFocus(mltb)
+        dialog.show()
+
+        QTest.keyClicks(mltb, 'abc\t', delay=self.delay)
+        self.assertTrue(mltb.hasFocus())
+
+        dialog.close()
+        dialog = None
+
+    # -------------------------------------------------------------------------
+    def test44_multiline_TextBox_leave_on_ctrl_enter(self):
+
+        dialog = createDialog(width=400, height=300)
+        mltb = dialog.addTextBox(multiline=True, leave_on_ctrl_enter=True)
+        dialog.setFocus(mltb)
+        dialog.show()
+
+        QTest.keyPress(mltb, QtCore.Qt.Key_Return, modifier=QtCore.Qt.ControlModifier, delay=self.delay)
+        self.assertFalse(mltb.hasFocus())
+
+        dialog.close()
+        dialog = None
+
+        dialog = createDialog(width=400, height=300)
+        mltb = dialog.addTextBox(multiline=True, leave_on_ctrl_enter=False)
+        dialog.setFocus(mltb)
+        dialog.show()
+
+        QTest.keyPress(mltb, QtCore.Qt.Key_Return, modifier=QtCore.Qt.ControlModifier, delay=self.delay)
+        self.assertTrue(mltb.hasFocus())
+
+        dialog.close()
+        dialog = None
+
 
     # -------------------------------------------------------------------------
     def test92_contextNuke(self):
