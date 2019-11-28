@@ -2610,7 +2610,7 @@ class QLabel(QtWidgets.QLabel):
 class QTextEdit(QtWidgets.QTextEdit):
     """
     """
-    leaving = QtCore.Signal()
+    leaving = QtCore.Signal(QtGui.QKeyEvent)
 
     # -------------------------------------------------------------------------
     def __init__(self,
@@ -2660,13 +2660,13 @@ class QTextEdit(QtWidgets.QTextEdit):
         """
         if self.leave_on_tab is True and event.key() == QtCore.Qt.Key_Tab:
             self.clearFocus()
-            self.leaving.emit()
+            self.leaving.emit(event)
             return
         elif (self.leave_on_ctrl_enter is True
                   and event.key() == QtCore.Qt.Key_Return
                   and event.modifiers() == QtCore.Qt.ControlModifier):
             self.clearFocus()
-            self.leaving.emit()
+            self.leaving.emit(event)
             return
         else:
             super(QTextEdit, self).keyPressEvent(event)
