@@ -1490,6 +1490,7 @@ class Dialog(QtWidgets.QDialog):
             'pythonw'     : 'python',
             'houdinicore' : 'houdini',
             'houdinifx'   : 'houdini',
+            'happrentice' : 'houdini',
             'hython'      : 'houdini',
             'cinema_4d'   : 'cinema4d',
             'nuke'        : 'nuke'
