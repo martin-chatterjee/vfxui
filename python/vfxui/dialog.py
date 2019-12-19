@@ -16,7 +16,7 @@ import time
 import importlib
 import logging
 
-from .pyside import QtCore, QtGui, QtWidgets
+from .pyside import QtCore, QtGui, QtWidgets, is_pyside2
 
 from .filebrowser import FileBrowser
 from .imagelabel import ImageLabel
@@ -2181,7 +2181,7 @@ class Dialog(QtWidgets.QDialog):
         """
         """
         with Guard():
-            font = 'MS Sans Serif'
+            font = 'Sans Serif'
             if 'font' in kwargs:
                 font = kwargs['font']
             font_size = 10
@@ -2625,7 +2625,8 @@ class QTextEdit(QtWidgets.QTextEdit):
         self.leave_on_tab = leave_on_tab
         self.leave_on_ctrl_enter = leave_on_ctrl_enter
 
-        self.textChanged.connect(self.placeholderVisible)
+        if not is_pyside2:
+            self.textChanged.connect(self.placeholderVisible)
 
     # -------------------------------------------------------------------------
     def placeholderVisible(self):
