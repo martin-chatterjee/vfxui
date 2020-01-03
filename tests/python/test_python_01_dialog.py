@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2017-2019, Martin Chatterjee. All rights reserved.
+# Copyright (c) 2017-2020, Martin Chatterjee. All rights reserved.
 # -----------------------------------------------------------------------------
 
 import os
@@ -20,7 +20,7 @@ from vfxtest import TestCase, mock
 QTest = QtTest.QTest
 
 
-# =============================================================================
+# -----------------------------------------------------------------------------
 class UI_Dialog_Test(TestCase):
     """
     """
