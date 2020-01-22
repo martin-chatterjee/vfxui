@@ -44,9 +44,7 @@ class FileBrowser(QtWidgets.QWidget):
         self.test_mode = None
         self.test_delay = 1 # seconds
 
-        self.initialdir = initialdir
-        if os.path.exists(self.initialdir) == False:
-            self.initialdir = 'C:/Temp'
+        self.initialdir = self._sanitizePath(initialdir)
         if mode == 'folder':
             self.__targetfolder = self.initialdir
 
@@ -223,18 +221,22 @@ class FileBrowser(QtWidgets.QWidget):
     def slot_text_editingFinished(self, **kwargs):
         """
         """
-        value = self.text.text()
-        value = value.strip().replace(' ', '/').replace('\\', '/')
-        if value.endswith('/'):
-            value = value[:-1]
-        while len(value) > 0 and not os.path.exists(value):
-            tokens = value.split('/')
-            value = '/'.join(tokens[:-1])
-
-        self.text.setText(value)
-        self.__targetfolder = value
+        path = self._sanitizePath(self.text.text())
+        self.text.setText(path)
+        self.__targetfolder = path
         self.button.setFocus(QtCore.Qt.TabFocusReason)
 
+    # -------------------------------------------------------------------------
+    def _sanitizePath(self, path):
+        """
+        """
+        path = path.strip().replace(' ', '/').replace('\\', '/')
+        if path.endswith('/'):
+            path = path[:-1]
+        while len(path) > 0 and not os.path.exists(path):
+            tokens = path.split('/')
+            path = '/'.join(tokens[:-1])
+        return path
 
     # -------------------------------------------------------------------------
     def setFixedHeight(self, height):

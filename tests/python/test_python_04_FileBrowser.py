@@ -165,7 +165,7 @@ class UI_FileBrowser_Test(TestCase):
         browser.showDialog(test_mode='accept')
         dialog.redraw()
         time.sleep(self.time_between_emits)
-        self.assertEqual(browser.targetfolder, u'C:/TEMP')
+        self.assertEqual(browser.targetfolder, u'{}'.format(basepath))
         self.assertEqual(browser.targetfile, u'')
 
         browser.showDialog(test_mode='reject')
@@ -241,5 +241,37 @@ class UI_FileBrowser_Test(TestCase):
         dialog.close()
         dialog = None
 
+        self.assertEqual(browser.targetfolder, basepath)
+        self.assertEqual(browser.targetfile, '')
+
+    # -------------------------------------------------------------------------
+    def test06_invalid_initialdir(self):
+
+        basepath = os.path.dirname(__file__).replace('\\', '/')
+
+        dialog = dlg.createDialog(title='dialog title',
+                                  width=400,
+                                  height=100,
+                                  fixed_size=False,
+                                  test_mode=False,
+                                  test_display_length=self.display_length)
+
+        dialog.addSpacer(30)
+        browser = dialog.addFileBrowser(
+                            mode='folder',
+                            width=300,
+                            direct_edit=True,
+                            label='awesome open Browser',
+                            initialdir='{}/does/not/exist'.format(basepath),
+                            selected_file='run_all_tests.py',
+                            filters=['Python (*.py)'])
+
+        dialog.addSpacer(30)
+
+        dialog.show()
+        dialog.redraw()
+
+        dialog.close()
+        dialog = None
         self.assertEqual(browser.targetfolder, basepath)
         self.assertEqual(browser.targetfile, '')
