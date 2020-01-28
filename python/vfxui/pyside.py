@@ -18,8 +18,12 @@ try:
     QtGui = PS2_QtGui
     import PySide2.QtWidgets as PS2_QtWidgets
     QtWidgets = PS2_QtWidgets
-    import PySide2.QtTest as PS2_QtTest
-    QtTest = PS2_QtTest
+    # catch issue with Maya + Houdini Engine where QtTest is not importable
+    try:
+        import PySide2.QtTest as PS2_QtTest
+        QtTest = PS2_QtTest
+    except ImportError: # pragma: no cover
+        pass
 
 except ImportError:
     is_pyside2 = False
@@ -28,8 +32,11 @@ except ImportError:
     import PySide.QtGui as PS_QtGui
     QtGui = PS_QtGui
     QtWidgets = PS_QtGui
-    import PySide.QtTest as PS_QtTest
-    QtTest = PS_QtTest
+    try:
+        import PySide.QtTest as PS_QtTest
+        QtTest = PS_QtTest
+    except ImportError: # pragma: no cover
+        pass
 
 try:
     import shiboken2 as PS2_shiboken
