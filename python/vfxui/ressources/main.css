@@ -522,3 +522,11 @@ FileBrowser QLineEdit {
 FileBrowser QPushButton {
     /*height: 30px;*/
 }
+
+QLabel[labelClass="FloatingMessage"] {
+    font-size: 20px;
+    color:#ffffff;
+    border-radius: 10px;
+    padding:10px 20px;
+    background-color: #00a1d1;
+}

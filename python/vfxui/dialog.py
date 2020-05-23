@@ -22,6 +22,7 @@ from .filebrowser import FileBrowser
 from .imagelabel import ImageLabel
 from .listbox import ListBox
 from .divider import Divider
+from .floatingmessage import FloatingMessage
 from .guard import Guard
 
 maya_main_window = None
@@ -432,6 +433,13 @@ class Dialog(QtWidgets.QDialog):
             self.setWindowFlags(self.windowFlags()
                                 | QtCore.Qt.WindowStaysOnTopHint)
 
+
+    # -------------------------------------------------------------------------
+    def createFloatingMessage(self, **kwargs):
+        """
+        """
+        msg = FloatingMessage(parent=self, **kwargs)
+        return msg
 
     # -------------------------------------------------------------------------
     def addTabsGroup(self, widget_id='tabsgroup'):
