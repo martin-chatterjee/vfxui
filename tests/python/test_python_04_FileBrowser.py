@@ -52,6 +52,7 @@ class UI_FileBrowser_Test(TestCase):
     def test01_filebrowser_open(self):
 
         basepath = os.path.dirname(__file__).replace('\\', '/')
+        filename = os.path.basename(__file__).replace('.pyc', '.py')
 
         dialog = dlg.createDialog(title='dialog title',
                                   width=400,
@@ -66,7 +67,7 @@ class UI_FileBrowser_Test(TestCase):
                             width=300,
                             label='awesome open Browser',
                             initialdir=basepath,
-                            selected_file='run_all_tests.py',
+                            selected_file=filename,
                             filters=['Python (*.py)'])
 
         dialog.addSpacer(30)
@@ -81,11 +82,12 @@ class UI_FileBrowser_Test(TestCase):
         button.click()
         dialog.redraw()
         time.sleep(self.time_between_emits)
-        self.assertEqual(browser.targetfile, u'run_all_tests.py')
+        self.assertEqual(browser.targetfile, filename)
         self.assertEqual(browser.targetfolder.lower(),
                          basepath.lower())
-        expected_filepath = u'%s/run_all_tests.py' % (browser.targetfolder)
+        expected_filepath = u'%s/%s' % (browser.targetfolder, filename)
         self.assertEqual(browser.targetfilepath, expected_filepath)
+        self.assertEqual(browser.targetfilepaths, [expected_filepath,])
 
         browser.test_mode = 'reject'
 
@@ -93,6 +95,7 @@ class UI_FileBrowser_Test(TestCase):
         dialog.redraw()
         time.sleep(self.time_between_emits)
         self.assertEqual(browser.targetfile, u'')
+        self.assertEqual(browser.targetfiles, ['',])
         self.assertEqual(browser.targetfolder, u'')
 
         dialog.close()
@@ -147,13 +150,14 @@ class UI_FileBrowser_Test(TestCase):
         basepath = os.path.dirname(__file__).replace('\\', '/')
 
         dialog = dlg.createDialog(title='dialog title',
-                                  width=400,
+                                  width=500,
                                   height=100,
                                   fixed_size=False)
 
         dialog.addSpacer(30)
         browser = dialog.addFileBrowser(
                             widget_id='folderBrowser',
+                            width=400,
                             mode='folder',
                             label='awesome folder Browser')
 
@@ -183,7 +187,7 @@ class UI_FileBrowser_Test(TestCase):
         basepath = os.path.dirname(__file__).replace('\\', '/')
 
         dialog = dlg.createDialog(title='dialog title',
-                                  width=400,
+                                  width=800,
                                   height=100,
                                   fixed_size=False,
                                   test_mode=False,
@@ -192,7 +196,6 @@ class UI_FileBrowser_Test(TestCase):
         dialog.addSpacer(30)
         browser = dialog.addFileBrowser(
                             mode='open',
-                            width=300,
                             label='awesome open Browser',
                             initialdir=basepath,
                             selected_file='run_all_tests.py',
@@ -209,7 +212,7 @@ class UI_FileBrowser_Test(TestCase):
         basepath = os.path.dirname(__file__).replace('\\', '/')
 
         dialog = dlg.createDialog(title='dialog title',
-                                  width=400,
+                                  width=800,
                                   height=100,
                                   fixed_size=False,
                                   test_mode=False,
@@ -218,7 +221,6 @@ class UI_FileBrowser_Test(TestCase):
         dialog.addSpacer(30)
         browser = dialog.addFileBrowser(
                             mode='open',
-                            width=300,
                             direct_edit=True,
                             label='awesome open Browser',
                             initialdir=basepath,
@@ -250,7 +252,7 @@ class UI_FileBrowser_Test(TestCase):
         basepath = os.path.dirname(__file__).replace('\\', '/')
 
         dialog = dlg.createDialog(title='dialog title',
-                                  width=400,
+                                  width=800,
                                   height=100,
                                   fixed_size=False,
                                   test_mode=False,
@@ -259,7 +261,6 @@ class UI_FileBrowser_Test(TestCase):
         dialog.addSpacer(30)
         browser = dialog.addFileBrowser(
                             mode='folder',
-                            width=300,
                             direct_edit=True,
                             label='awesome open Browser',
                             initialdir='{}/does/not/exist'.format(basepath),
@@ -275,3 +276,62 @@ class UI_FileBrowser_Test(TestCase):
         dialog = None
         self.assertEqual(browser.targetfolder, basepath)
         self.assertEqual(browser.targetfile, '')
+
+
+    # -------------------------------------------------------------------------
+    def test07_multi_select(self):
+
+        basepath = os.path.dirname(__file__).replace('\\', '/')
+        files = []
+        for item in sorted(os.listdir(basepath)):
+            if item.endswith('.py'):
+                files.append(item)
+                if len(files) >= 4:
+                    break
+        escaped = ['"{}"'.format(item) for item in files]
+        files_string = ' '.join(escaped)
+
+        shown_files = list(files)[:3]
+        if len(files) > 3:
+            shown_files.append('...')
+        expected_text = '{}/[ {} ]'.format(basepath, ', '.join(shown_files))
+
+        selected_files = '"complexDialog.py" "mocked_cmds.py"'
+        dialog = dlg.createDialog(title='dialog title',
+                                  width=800,
+                                  height=100,
+                                  fixed_size=False,
+                                  test_mode=False,
+                                  test_display_length=self.display_length)
+
+        dialog.addSpacer(30)
+        browser = dialog.addFileBrowser(
+                            mode='open',
+                            multiselect=True,
+                            selected_file = files_string,
+                            label='awesome open Browser',
+                            initialdir=basepath,
+                            filters=['Python (*.py)'])
+
+        dialog.addSpacer(30)
+
+        dialog.show()
+        dialog.redraw()
+        time.sleep(self.time_between_emits)
+
+        button = browser.button
+        browser.test_mode = 'accept'
+        browser.test_delay = self.time_between_emits
+        button.click()
+
+
+        dialog.redraw()
+        time.sleep(self.time_between_emits)
+
+        dialog.close()
+        dialog = None
+
+        self.assertEqual(browser.targetfolder, basepath)
+        self.assertEqual(browser.targetfile, files[0])
+        self.assertEqual(browser.targetfiles, files)
+        self.assertEqual(browser.text.text(), expected_text)

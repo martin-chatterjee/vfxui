@@ -1030,6 +1030,7 @@ class Dialog(QtWidgets.QDialog):
     def addFileBrowser(self,
                        widget_id='fileBrowser',
                        mode='open',
+                       multiselect=False,
                        initialdir='',
                        button_label="...",
                        show_text=True,
@@ -1045,6 +1046,7 @@ class Dialog(QtWidgets.QDialog):
         Args:
             widget_id (string)      : unique id for this widget
             mode (string)           : mode of FileBrowser: 'open', 'save', 'folder'
+            multiselect (bool)      : allows multiselection of files in 'open' mode
             initialdir (string)     : initial directory
             button_label (string)   : Label of the button
             show_text (bool)        : if True displays picking in read-only TextBox
@@ -1064,6 +1066,7 @@ class Dialog(QtWidgets.QDialog):
         # create widget
         widget = FileBrowser(label=label,
                              mode=mode,
+                             multiselect=multiselect,
                              show_text=show_text,
                              button_label=button_label,
                              initialdir=initialdir,

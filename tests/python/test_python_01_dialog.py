@@ -1091,6 +1091,7 @@ class UI_Dialog_Test(TestCase):
     def test94_DialogBase_redraw_maya(self):
 
         basepath = os.path.dirname(__file__).replace('\\', '/')
+        filename = os.path.basename(__file__).replace('.pyc', '.py')
 
         import mocked_cmds
 
@@ -1125,7 +1126,7 @@ class UI_Dialog_Test(TestCase):
                                         width=300,
                                         label='awesome open Browser',
                                         initialdir=basepath,
-                                        selected_file='run_all_tests.py',
+                                        selected_file=filename,
                                         filters=['Python (*.py)'])
 
                     dialog.addSpacer(30)
@@ -1139,7 +1140,7 @@ class UI_Dialog_Test(TestCase):
                     button.click()
                     dialog.redraw()
                     time.sleep(self.time_between_emits)
-                    self.assertEqual(widget.targetfile, u'run_all_tests.py')
+                    self.assertEqual(widget.targetfile, filename)
                     self.assertEqual(widget.targetfolder.lower(),
                                      basepath.lower())
 

@@ -29,7 +29,8 @@ class FileBrowser(QtWidgets.QWidget):
                  mode='open',
                  filters=[],
                  initialdir='',
-                 selected_file=''):
+                 selected_file='',
+                 multiselect=False):
         """
         """
 
@@ -37,9 +38,12 @@ class FileBrowser(QtWidgets.QWidget):
 
         self.__targetfolder = ''
         self.__targetfile = ''
+        self.__targetfiles = ['']
 
         # store settings
         self.mode = mode
+        self.__multiselect = False
+        self.multiselect = multiselect
 
         self.test_mode = None
         self.test_delay = 1 # seconds
@@ -79,8 +83,9 @@ class FileBrowser(QtWidgets.QWidget):
             activeLayout = self.groupLayout
 
         self.text = QtWidgets.QLineEdit()
-        if direct_edit is False:
-            self.text.setEnabled(False)
+        self.text.setEnabled(False)
+        if direct_edit and not self.multiselect:
+            self.text.setEnabled(True)
         self.text.setToolTip(self.dialog_caption)
         self.text.setText(self.targetfilepath)
         self.text.editingFinished.connect(self.slot_text_editingFinished)
@@ -115,6 +120,20 @@ class FileBrowser(QtWidgets.QWidget):
 
     # -------------------------------------------------------------------------
     @property
+    def multiselect(self):
+        """
+        """
+        return self.__multiselect
+
+    @multiselect.setter
+    def multiselect(self, value):
+        if value is True:
+            self.__multiselect = True
+        else:
+            self.__multiselect = False
+
+    # -------------------------------------------------------------------------
+    @property
     def targetfolder(self):
         """
         """
@@ -129,6 +148,13 @@ class FileBrowser(QtWidgets.QWidget):
 
     # -------------------------------------------------------------------------
     @property
+    def targetfiles(self):
+        """
+        """
+        return self.__targetfiles
+
+    # -------------------------------------------------------------------------
+    @property
     def targetfilepath(self):
         """
         """
@@ -136,6 +162,17 @@ class FileBrowser(QtWidgets.QWidget):
         if tfp.endswith('/'):
             tfp = tfp[:-1]
         return tfp
+
+    # -------------------------------------------------------------------------
+    @property
+    def targetfilepaths(self):
+        """
+        """
+        filepaths = []
+        for file in self.targetfiles:
+            tfp = '%s/%s' % (self.targetfolder, file)
+            filepaths.append(tfp)
+        return filepaths
 
     # -------------------------------------------------------------------------
     def showDialog(self, test_mode=None):
@@ -161,7 +198,10 @@ class FileBrowser(QtWidgets.QWidget):
 
         if self.mode == 'open':
             self.filebrowser.setAcceptMode(QtWidgets.QFileDialog.AcceptOpen)
-
+            if self.multiselect:
+                self.filebrowser.setFileMode(QtWidgets.QFileDialog.ExistingFiles)
+            else:
+                self.filebrowser.setFileMode(QtWidgets.QFileDialog.ExistingFile)
         elif self.mode == 'save':
             self.filebrowser.setAcceptMode(QtWidgets.QFileDialog.AcceptSave)
 
@@ -183,20 +223,27 @@ class FileBrowser(QtWidgets.QWidget):
                 self.filebrowser.reject()
             status = self.filebrowser.result()
         if status:
-            path = self.filebrowser.selectedFiles()[0]
-
-            # conform and process path
-            path = path.replace('\\', '/').strip()
+            paths = self.filebrowser.selectedFiles()
+            # conform and process paths and names
+            conformed_paths = []
+            base_names = []
+            for path in paths:
+                path = path.replace('\\', '/').strip()
+                conformed_paths.append(path)
+                base_names.append(os.path.basename(path))
 
             if self.mode == 'folder':
-                self.__targetfolder = path
+                self.__targetfolder = conformed_paths[0]
                 self.__targetfile = ''
+                self.__targetfiles = ['',]
             else:
-                self.__targetfolder = os.path.dirname(path)
-                self.__targetfile = os.path.basename(path)
+                self.__targetfolder = os.path.dirname(conformed_paths[0])
+                self.__targetfile = base_names[0]
+                self.__targetfiles = base_names
         else:
             self.__targetfolder = ''
             self.__targetfile = ''
+            self.__targetfiles = ['',]
 
         self._updateText()
 
@@ -206,7 +253,13 @@ class FileBrowser(QtWidgets.QWidget):
         """
         content = self.targetfolder
         if self.targetfile != '':
-            content += '/' + self.targetfile
+            if len(self.targetfiles) > 1:
+                files = list(self.targetfiles)[:3]
+                if len(self.targetfiles) > 3:
+                    files.append('...')
+                content = '{}/[ {} ]'.format(content, ', '.join(files))
+            else:
+                content = self.targetfilepath
 
         self.text.setText(content)
 
