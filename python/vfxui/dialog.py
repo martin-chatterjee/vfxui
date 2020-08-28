@@ -84,6 +84,7 @@ class Dialog(QtWidgets.QDialog):
     app = None
 
     dialogOpen = QtCore.Signal()
+    dialogClosed = QtCore.Signal()
     escapePressed = QtCore.Signal()
     returnPressed = QtCore.Signal()
     _font_db = None
@@ -1612,6 +1613,7 @@ class Dialog(QtWidgets.QDialog):
             if self.last_view_modal is False:
                 self.deleteLater()
 
+        self.dialogClosed.emit()
         super(Dialog, self).close()
 
     # -------------------------------------------------------------------------
