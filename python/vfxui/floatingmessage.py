@@ -20,6 +20,7 @@ class FloatingMessage(QtWidgets.QWidget):
         """
         super(FloatingMessage, self).__init__(parent=parent)
         self._message = ''
+        self.top = None
 
         self.setWindowFlags(QtCore.Qt.Tool | QtCore.Qt.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
@@ -36,7 +37,7 @@ class FloatingMessage(QtWidgets.QWidget):
         self.hide()
 
     # -------------------------------------------------------------------------
-    def show(self, message=''):
+    def show(self, message='', duration=3.0):
         """
         """
         if self.isVisible():
@@ -49,6 +50,9 @@ class FloatingMessage(QtWidgets.QWidget):
         self.updatePosition()
         super(FloatingMessage, self).show()
         QtCore.QCoreApplication.processEvents()
+
+        if duration:
+            QtCore.QTimer.singleShot(duration * 1000.0, self.hide)
 
 
     # -------------------------------------------------------------------------
@@ -63,6 +67,9 @@ class FloatingMessage(QtWidgets.QWidget):
 
         window_y = window.y()
         window_height = window.height()
-        progress_y = window_y + (window_height / 1.618)
+        offset_y = (window_height / 1.618)
+        if self.top:
+            offset_y = self.top
+        progress_y = window_y + offset_y
 
         self.move(progress_x, progress_y)

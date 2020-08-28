@@ -22,6 +22,7 @@ from .filebrowser import FileBrowser
 from .imagelabel import ImageLabel
 from .listbox import ListBox
 from .divider import Divider
+from .heading import Heading
 from .floatingmessage import FloatingMessage
 from .guard import Guard
 
@@ -781,6 +782,25 @@ class Dialog(QtWidgets.QDialog):
 
         """
         tabs_widget.setCurrentWidget(tab)
+
+    # -------------------------------------------------------------------------
+    def addHeading(self,
+                   widget_id='heading',
+                   label='',
+                   size='h1',
+                   indent=0,
+                   font='Gotham Light',
+                   **kwargs):
+        """
+        """
+        result = None
+        widget = Heading(label=label, size=size, indent=indent)
+        kwargs['font'] = font
+        self._processKwargs(widget, kwargs)
+
+        # store widget
+        widget_id = self._storeWidget(widget, widget_id)
+        return widget
 
     # -------------------------------------------------------------------------
     def addHeadline(self,

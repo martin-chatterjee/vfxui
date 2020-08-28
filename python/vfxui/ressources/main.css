@@ -530,3 +530,58 @@ QLabel[labelClass="FloatingMessage"] {
     padding:10px 20px;
     background-color: #00a1d1;
 }
+
+
+QLabel[labelClass="h1_indent"] {
+    font-size:25px;
+    margin: 1.0em 0 0 0;
+    padding: 0 0 0 0;
+    border-top: 1px solid #666666;
+}
+
+QLabel[labelClass="h1_label"] {
+    font-size:25px;
+    margin: 0 10px 0 0 ;
+}
+
+QLabel[labelClass="h1_line"] {
+    font-size:25px;
+    margin: 1.0em 0 0 0 ;
+    border-top: 1px solid #666666;
+}
+
+QLabel[labelClass="h2_indent"] {
+    font-size:20px;
+    margin: 1.0em 0 0 0;
+    padding: 0 0 0 0;
+    border-top: 1px solid #666666;
+}
+
+QLabel[labelClass="h2_line"] {
+    font-size:20px;
+    margin: 1.0em 0 0 0 ;
+    border-top: 1px solid #666666;
+}
+
+QLabel[labelClass="h2_label"] {
+    font-size:20px;
+    margin: 0 10px 0 0 ;
+}
+
+QLabel[labelClass="h3_indent"] {
+    font-size:16px;
+    margin: 1.0em 0 0 0;
+    padding: 0 0 0 0;
+    border-top: 1px solid #666666;
+}
+
+QLabel[labelClass="h3_line"] {
+    font-size:16px;
+    margin: 1.0em 0 0 0 ;
+    border-top: 1px solid #666666;
+}
+
+QLabel[labelClass="h3_label"] {
+    font-size:16px;
+    margin: 0 10px 0 0 ;
+}
