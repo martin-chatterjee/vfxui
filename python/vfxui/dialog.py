@@ -427,6 +427,14 @@ class Dialog(QtWidgets.QDialog):
             self.setProperty('labelClass', 'splashscreen')
 
     # -------------------------------------------------------------------------
+    def setTransparentBackground(self):
+        """sets the background of the Dialog to be transparent.
+
+        """
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+
+    # -------------------------------------------------------------------------
     def setAlwaysOnTop(self):
         """Flags the current dialog window type to be always on top
 
