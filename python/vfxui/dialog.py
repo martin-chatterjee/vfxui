@@ -16,7 +16,7 @@ import time
 import importlib
 import logging
 
-from .pyside import QtCore, QtGui, QtWidgets, is_pyside2
+from .pyside import QtCore, QtGui, QtWidgets, is_pyside2, uses_sgtk
 
 from .filebrowser import FileBrowser
 from .imagelabel import ImageLabel
@@ -2404,7 +2404,10 @@ def createDialog(targetclass=None, parent=None, **kwargs):
 
     if parent is None:
 
-        if context == 'maya':
+        if uses_sgtk:
+            parent = QtWidgets.QApplication.activeWindow()
+
+        elif context == 'maya':
             parent = maya_main_window
             # for widget in QtWidgets.QApplication.topLevelWidgets():
             #     name = widget.objectName()
