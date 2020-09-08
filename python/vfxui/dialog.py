@@ -16,7 +16,7 @@ import time
 import importlib
 import logging
 
-from .pyside import QtCore, QtGui, QtWidgets, is_pyside2, uses_sgtk
+from .pyside import QtCore, QtGui, QtWidgets, is_pyside2, uses_sgtk_imports
 
 from .filebrowser import FileBrowser
 from .imagelabel import ImageLabel
@@ -2419,7 +2419,7 @@ def createDialog(targetclass=None, parent=None, **kwargs):
             import hou
             parent = hou.qt.mainWindow()
 
-        elif uses_sgtk:
+        elif uses_sgtk_imports:
             parent = QtWidgets.QApplication.activeWindow()
 
         # create our own QAppliction for all other cases
