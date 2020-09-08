@@ -2404,10 +2404,7 @@ def createDialog(targetclass=None, parent=None, **kwargs):
 
     if parent is None:
 
-        if uses_sgtk:
-            parent = QtWidgets.QApplication.activeWindow()
-
-        elif context == 'maya':
+        if context == 'maya':
             parent = maya_main_window
             # for widget in QtWidgets.QApplication.topLevelWidgets():
             #     name = widget.objectName()
@@ -2421,6 +2418,9 @@ def createDialog(targetclass=None, parent=None, **kwargs):
         elif context.startswith('houdini'):
             import hou
             parent = hou.qt.mainWindow()
+
+        elif uses_sgtk:
+            parent = QtWidgets.QApplication.activeWindow()
 
         # create our own QAppliction for all other cases
         # (right now these are Python and Cinema4D)
