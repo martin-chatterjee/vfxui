@@ -16,7 +16,7 @@ import time
 import importlib
 import logging
 
-from .pyside import QtCore, QtGui, QtWidgets, is_pyside2
+from .pyside import QtCore, QtGui, QtWidgets, is_pyside2, uses_sgtk_imports
 
 from .filebrowser import FileBrowser
 from .imagelabel import ImageLabel
@@ -2406,11 +2406,6 @@ def createDialog(targetclass=None, parent=None, **kwargs):
 
         if context == 'maya':
             parent = maya_main_window
-            # for widget in QtWidgets.QApplication.topLevelWidgets():
-            #     name = widget.objectName()
-            #     if name == 'MayaWindow':
-            #         parent = widget
-            #         break
 
         elif context.startswith('nuke'):
             parent = QtWidgets.QApplication.activeWindow()
@@ -2419,15 +2414,28 @@ def createDialog(targetclass=None, parent=None, **kwargs):
             import hou
             parent = hou.qt.mainWindow()
 
-        # create our own QAppliction for all other cases
-        # (right now these are Python and Cinema4D)
         else:
-            if Dialog.app is None:
-                Dialog.app = QtWidgets.QApplication(sys.argv)
-            # set icon
-            icon = os.path.dirname(__file__).replace('\\', '/') + '/ressources/logo.png'
-            if os.path.exists(icon):
-                Dialog.app.setWindowIcon(QtGui.QIcon(icon))
+            if uses_sgtk_imports:
+                # try to play nice with shotgun toolkit
+                with Guard():
+                    import sgtk.platform
+                    engine = sgtk.platform.current_engine()
+                    parent = engine._get_dialog_parent()
+                    if not parent:
+                        parent, _ = engine._create_dialog_with_widget('_',
+                                                                      engine,
+                                                                      QtWidgets.QWidget)
+            if parent is None:
+                # create our own QAppliction for all other cases
+                # (right now these are Python and Cinema4D)
+                if Dialog.app is None:
+                    Dialog.app = QtWidgets.QApplication.instance()
+                if Dialog.app is None:
+                    Dialog.app = QtWidgets.QApplication(sys.argv)
+                # set icon
+                icon = os.path.dirname(__file__).replace('\\', '/') + '/ressources/logo.png'
+                if os.path.exists(icon):
+                    Dialog.app.setWindowIcon(QtGui.QIcon(icon))
 
     # create the dialog object
     dialog = resolvedclass(parent=parent, **kwargs)
