@@ -1666,6 +1666,11 @@ class Dialog(QtWidgets.QDialog):
         if not self.is_child_widget:
             self.dialogOpen.emit()
 
+        try:
+            self.activateWindow()
+        except Exception as e:
+            logger.exception('Failed to activate and focus window')
+
         super(Dialog, self).show()
 
         if self.test_mode:
@@ -1790,6 +1795,11 @@ class Dialog(QtWidgets.QDialog):
                 t.setSingleShot(True)
                 t.timeout.connect(btn.animateClick)
                 t.start(self.__test_display_length)
+
+        try:
+            self.activateWindow()
+        except Exception as e:
+            logger.exception('Failed to activate and focus window')
 
         self.exec_()
 
