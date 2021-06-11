@@ -996,7 +996,7 @@ class Dialog(QtWidgets.QDialog):
             label (string)          : label for this TextBox.
                                       (optional, defaults to None)
             label_width (int)       : width of label in pixels
-                                      (optional, defaults to None)
+                                      (optional, defaxults to None)
             expression (string)     : regular expression to control text input
                                       (optional, defaults to None)
             kwargs (keyword args)   : optional kwargs processed by _processKwargs()
@@ -2568,6 +2568,8 @@ class MsgBox(Dialog):
         if 'mode' in kwargs:
             if kwargs['mode'] == 'warning':
                 self.icon = './ressources/warning.png'
+            elif kwargs['mode'] == 'question':
+                self.icon = './ressources/questionmark.png'
 
         self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
 
