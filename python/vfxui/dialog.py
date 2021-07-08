@@ -31,7 +31,11 @@ try: # pragma: no cover
     import maya.OpenMayaUI as omui
     from .pyside import shiboken
     ptr = omui.MQtUtil.mainWindow()
-    maya_main_window = shiboken.wrapInstance(long(ptr), QtWidgets.QWidget)
+    try:
+        ptr = long(ptr)
+    except NameError:
+        ptr = int(ptr)
+    maya_main_window = shiboken.wrapInstance(ptr, QtWidgets.QWidget)
 except:
     pass
 
