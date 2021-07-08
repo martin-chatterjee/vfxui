@@ -2439,20 +2439,37 @@ def createDialog(targetclass=None, parent=None, **kwargs):
             parent = hou.qt.mainWindow()
 
         else:
-            if Dialog.app is None:
-                print('>> trying to re-use existing QApplication')
-                Dialog.app = QtWidgets.QApplication.instance()
-            if Dialog.app is None:
-                print('>> creating our own QApplication')
-                Dialog.standalone = True
-                Dialog.app = QtWidgets.QApplication(sys.argv)
-                # set icon
-                icon = os.path.dirname(__file__).replace('\\', '/') + '/ressources/logo.png'
-                if os.path.exists(icon):
-                    Dialog.app.setWindowIcon(QtGui.QIcon(icon))
-            if context == 'cinema4d':
-                Dialog.standalone = False
-            dbg = True
+
+            if parent is None:
+                import sgtk
+                logger = sgtk.LogManager.get_logger(__name__)
+
+                if Dialog.app is None:
+                    print('>> trying to re-use existing QApplication')
+                    logger.info('>> trying to re-use existing QApplication')
+                    logger.info('>> {}'.format(context))
+                    if Dialog.app is None:
+                        logger.info('a is None')
+                    logger.info('a >> {}'.format([Dialog.app]))
+                    Dialog.app = QtWidgets.qApp
+                    # Dialog.app = QtWidgets.QApplication.instance()
+                    if Dialog.app is None:
+                        logger.info('b is None')
+                        Dialog.
+                    logger.info('b >> {}'.format([Dialog.app]))
+
+                if Dialog.app is None:
+                    print('>> creating our own QApplication')
+                    logger.info('>> creating our own QApplication')
+                    Dialog.standalone = True
+                    Dialog.app = QtWidgets.QApplication(sys.argv)
+                    # set icon
+                    icon = os.path.dirname(__file__).replace('\\', '/') + '/ressources/logo.png'
+                    if os.path.exists(icon):
+                        Dialog.app.setWindowIcon(QtGui.QIcon(icon))
+                if context == 'cinema4d':
+                    Dialog.standalone = False
+                dbg = True
 
 
     # create the dialog object
