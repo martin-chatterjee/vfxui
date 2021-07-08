@@ -1677,7 +1677,6 @@ class Dialog(QtWidgets.QDialog):
             self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
 
         if Dialog.standalone:
-            print('>>> show() in standalone mode')
             return self.exec_()
 
         super(Dialog, self).show()
@@ -2425,7 +2424,7 @@ def createDialog(targetclass=None, parent=None, **kwargs):
     context = Dialog._context
 
     dialog = None
-    dbg = False
+    store_dialog_handle = False
     if parent is None:
 
         if context == 'maya':
@@ -2439,50 +2438,33 @@ def createDialog(targetclass=None, parent=None, **kwargs):
             parent = hou.qt.mainWindow()
 
         else:
-
-            if parent is None:
-                import sgtk
-                logger = sgtk.LogManager.get_logger(__name__)
-
-                if Dialog.app is None:
-                    print('>> trying to re-use existing QApplication')
-                    logger.info('>> trying to re-use existing QApplication')
-                    logger.info('>> {}'.format(context))
-                    if Dialog.app is None:
-                        logger.info('a is None')
-                    logger.info('a >> {}'.format([Dialog.app]))
-                    Dialog.app = QtWidgets.qApp
-                    if Dialog.app is not None:
-                        logger.info('instance is not None')
+            if Dialog.app is None:
+                Dialog.app = QtWidgets.QApplication.instance()
+                if Dialog.app is not None:
+                    with Guard():
                         import sgtk.platform
                         engine = sgtk.platform.current_engine()
-                        logger.info('engine:  {}'.format(engine.instance_name))
                         if engine.instance_name == 'tk-desktop':
                             parent = engine._get_dialog_parent()
                             if not parent:
-                                logger.info('-- creating parent widget --')
                                 parent, _ = engine._create_dialog_with_widget('_',
-                                                                                     engine,
-                                                                                     QtWidgets.QWidget)
-                                logger.info('-- {}'.format(parent))
+                                                                              engine,
+                                                                              QtWidgets.QWidget)
 
-                if Dialog.app is None:
-                    print('>> creating our own QApplication')
-                    logger.info('>> creating our own QApplication')
-                    Dialog.standalone = True
-                    Dialog.app = QtWidgets.QApplication(sys.argv)
-                    # set icon
-                    icon = os.path.dirname(__file__).replace('\\', '/') + '/ressources/logo.png'
-                    if os.path.exists(icon):
-                        Dialog.app.setWindowIcon(QtGui.QIcon(icon))
-                if context == 'cinema4d':
-                    Dialog.standalone = False
-                dbg = True
-
+            if Dialog.app is None:
+                Dialog.standalone = True
+                Dialog.app = QtWidgets.QApplication(sys.argv)
+                # set icon
+                icon = os.path.dirname(__file__).replace('\\', '/') + '/ressources/logo.png'
+                if os.path.exists(icon):
+                    Dialog.app.setWindowIcon(QtGui.QIcon(icon))
+            if context == 'cinema4d':
+                Dialog.standalone = False
+            store_dialog_handle = True
 
     # create the dialog object
     dialog = resolvedclass(parent=parent, **kwargs)
-    if dbg:
+    if store_dialog_handle:
         Dialog.stored_dialogs.append(dialog)
 
     return dialog
