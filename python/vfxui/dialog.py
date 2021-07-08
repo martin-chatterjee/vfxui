@@ -2452,11 +2452,19 @@ def createDialog(targetclass=None, parent=None, **kwargs):
                         logger.info('a is None')
                     logger.info('a >> {}'.format([Dialog.app]))
                     Dialog.app = QtWidgets.qApp
-                    # Dialog.app = QtWidgets.QApplication.instance()
-                    if Dialog.app is None:
-                        logger.info('b is None')
-                        Dialog.
-                    logger.info('b >> {}'.format([Dialog.app]))
+                    if Dialog.app is not None:
+                        logger.info('instance is not None')
+                        import sgtk.platform
+                        engine = sgtk.platform.current_engine()
+                        logger.info('engine:  {}'.format(engine.instance_name))
+                        if engine.instance_name == 'tk-desktop':
+                            parent = engine._get_dialog_parent()
+                            if not parent:
+                                logger.info('-- creating parent widget --')
+                                parent, _ = engine._create_dialog_with_widget('_',
+                                                                                     engine,
+                                                                                     QtWidgets.QWidget)
+                                logger.info('-- {}'.format(parent))
 
                 if Dialog.app is None:
                     print('>> creating our own QApplication')
