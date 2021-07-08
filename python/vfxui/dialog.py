@@ -16,7 +16,7 @@ import time
 import importlib
 import logging
 
-from .pyside import QtCore, QtGui, QtWidgets, is_pyside2, uses_sgtk_imports
+from .pyside import QtCore, QtGui, QtWidgets, is_pyside2
 
 from .filebrowser import FileBrowser
 from .imagelabel import ImageLabel
@@ -81,8 +81,11 @@ class Dialog(QtWidgets.QDialog):
     """
 
     ## handle of the current QApplication handle
-    standalone = False
     app = None
+    ## True if this is a Standalone PySide session with it's own QApplication
+    standalone = False
+    ## reference storage for dialogs in standalone mode to prevent
+    ## garbage collection
     stored_dialogs = []
 
     dialogOpen = QtCore.Signal()
@@ -2436,8 +2439,8 @@ def createDialog(targetclass=None, parent=None, **kwargs):
         elif context.startswith('houdini'):
             import hou
             parent = hou.qt.mainWindow()
-
         else:
+            # try to re-use an existing QApplication
             if Dialog.app is None:
                 Dialog.app = QtWidgets.QApplication.instance()
                 if Dialog.app is not None:
@@ -2445,12 +2448,15 @@ def createDialog(targetclass=None, parent=None, **kwargs):
                         import sgtk.platform
                         engine = sgtk.platform.current_engine()
                         if engine.instance_name == 'tk-desktop':
+                            # work around the bug in 'tk-desktop' that silently
+                            # swallows the first created dialog
                             parent = engine._get_dialog_parent()
                             if not parent:
                                 parent, _ = engine._create_dialog_with_widget('_',
                                                                               engine,
                                                                               QtWidgets.QWidget)
-
+            # create our own QAppliction for all other cases
+            # (right now these are Python and Cinema4D)
             if Dialog.app is None:
                 Dialog.standalone = True
                 Dialog.app = QtWidgets.QApplication(sys.argv)
