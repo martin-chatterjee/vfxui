@@ -88,8 +88,7 @@ class Dialog(QtWidgets.QDialog):
     app = None
     ## True if this is a Standalone PySide session with it's own QApplication
     standalone = False
-    ## reference storage for dialogs in standalone mode to prevent
-    ## garbage collection
+    ## reference storage for dialogs in standalone mode to prevent garbage collection
     stored_dialogs = []
 
     dialogOpen = QtCore.Signal()
@@ -1675,11 +1674,6 @@ class Dialog(QtWidgets.QDialog):
         if not self.is_child_widget:
             self.dialogOpen.emit()
 
-        try:
-            self.activateWindow()
-        except Exception as e:
-            logger.exception('Failed to activate and focus window')
-
         if Dialog.app:
             self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
 
@@ -1810,11 +1804,6 @@ class Dialog(QtWidgets.QDialog):
                 t.setSingleShot(True)
                 t.timeout.connect(btn.animateClick)
                 t.start(self.__test_display_length)
-
-        try:
-            self.activateWindow()
-        except Exception as e:
-            logger.exception('Failed to activate and focus window')
 
         if not Dialog.standalone and Dialog.app:
             self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
