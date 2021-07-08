@@ -81,7 +81,9 @@ class Dialog(QtWidgets.QDialog):
     """
 
     ## handle of the current QApplication handle
+    standalone = False
     app = None
+    stored_dialogs = []
 
     dialogOpen = QtCore.Signal()
     dialogClosed = QtCore.Signal()
@@ -1671,6 +1673,13 @@ class Dialog(QtWidgets.QDialog):
         except Exception as e:
             logger.exception('Failed to activate and focus window')
 
+        if Dialog.app:
+            self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
+
+        if Dialog.standalone:
+            print('>>> show() in standalone mode')
+            return self.exec_()
+
         super(Dialog, self).show()
 
         if self.test_mode:
@@ -1801,7 +1810,12 @@ class Dialog(QtWidgets.QDialog):
         except Exception as e:
             logger.exception('Failed to activate and focus window')
 
-        self.exec_()
+        if not Dialog.standalone and Dialog.app:
+            self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
+            super(Dialog, self).show()
+            self.redraw()
+        else:
+            self.exec_()
 
         return self.modal_return_value
 
@@ -2411,7 +2425,7 @@ def createDialog(targetclass=None, parent=None, **kwargs):
     context = Dialog._context
 
     dialog = None
-
+    dbg = False
     if parent is None:
 
         if context == 'maya':
@@ -2425,30 +2439,26 @@ def createDialog(targetclass=None, parent=None, **kwargs):
             parent = hou.qt.mainWindow()
 
         else:
-            if uses_sgtk_imports:
-                # try to play nice with shotgun toolkit
-                with Guard():
-                    import sgtk.platform
-                    engine = sgtk.platform.current_engine()
-                    parent = engine._get_dialog_parent()
-                    if not parent:
-                        parent, _ = engine._create_dialog_with_widget('_',
-                                                                      engine,
-                                                                      QtWidgets.QWidget)
-            if parent is None:
-                # create our own QAppliction for all other cases
-                # (right now these are Python and Cinema4D)
-                if Dialog.app is None:
-                    Dialog.app = QtWidgets.QApplication.instance()
-                if Dialog.app is None:
-                    Dialog.app = QtWidgets.QApplication(sys.argv)
+            if Dialog.app is None:
+                print('>> trying to re-use existing QApplication')
+                Dialog.app = QtWidgets.QApplication.instance()
+            if Dialog.app is None:
+                print('>> creating our own QApplication')
+                Dialog.standalone = True
+                Dialog.app = QtWidgets.QApplication(sys.argv)
                 # set icon
                 icon = os.path.dirname(__file__).replace('\\', '/') + '/ressources/logo.png'
                 if os.path.exists(icon):
                     Dialog.app.setWindowIcon(QtGui.QIcon(icon))
+            if context == 'cinema4d':
+                Dialog.standalone = False
+            dbg = True
+
 
     # create the dialog object
     dialog = resolvedclass(parent=parent, **kwargs)
+    if dbg:
+        Dialog.stored_dialogs.append(dialog)
 
     return dialog
 
