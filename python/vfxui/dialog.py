@@ -112,6 +112,7 @@ class Dialog(QtWidgets.QDialog):
         """
         super(Dialog, self).__init__(parent=parent)
 
+        self.parent = parent
         ## if True the size can not be changed by user.
         self.__fixed_size = False
         ## dialog width.
@@ -1807,11 +1808,12 @@ class Dialog(QtWidgets.QDialog):
 
         if not Dialog.standalone and Dialog.app:
             self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
-            super(Dialog, self).show()
-            self.redraw()
-        else:
-            self.exec_()
+            if not self.parent:
+                super(Dialog, self).show()
+                self.redraw()
+                return None
 
+        self.exec_()
         return self.modal_return_value
 
 
