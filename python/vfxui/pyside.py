@@ -9,12 +9,10 @@ QtCore = None
 QtGui = None
 QtWidgets = None
 QtTest = None
+is_pyside2 = True
 shiboken = None
 
-is_pyside2 = False
-
 try:
-    is_pyside2 = True
     import PySide2.QtCore as PS2_QtCore
     QtCore = PS2_QtCore
     import PySide2.QtGui as PS2_QtGui
@@ -30,21 +28,17 @@ try:
 
 except ImportError:
     # fall back to PySide
+    is_pyside2 = False
+    import PySide.QtCore as PS_QtCore
+    QtCore = PS_QtCore
+    import PySide.QtGui as PS_QtGui
+    QtGui = PS_QtGui
+    QtWidgets = PS_QtGui
+    # catch issue with Maya + Houdini Engine where QtTest is not importable
     try:
-        is_pyside2 = False
-        import PySide.QtCore as PS_QtCore
-        QtCore = PS_QtCore
-        import PySide.QtGui as PS_QtGui
-        QtGui = PS_QtGui
-        QtWidgets = PS_QtGui
-        try:
-            import PySide.QtTest as PS_QtTest
-            QtTest = PS_QtTest
-        except ImportError: # pragma: no cover
-            pass
-
-    except ImportError:
-        # giving up...
+        import PySide.QtTest as PS_QtTest
+        QtTest = PS_QtTest
+    except ImportError: # pragma: no cover
         pass
 
 try:
