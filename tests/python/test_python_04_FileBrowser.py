@@ -33,7 +33,7 @@ class UI_FileBrowser_Test(TestCase):
         basepath = os.path.dirname(__file__).replace('\\', '/')
 
         cls.display_length = 100
-        cls.time_between_emits = .1
+        cls.time_between_emits = .3
         cls.delay = 20
 
     # -------------------------------------------------------------------------
@@ -85,6 +85,8 @@ class UI_FileBrowser_Test(TestCase):
         self.assertEqual(browser.targetfile, filename)
         self.assertEqual(browser.targetfolder.lower(),
                          basepath.lower())
+
+
         expected_filepath = u'%s/%s' % (browser.targetfolder, filename)
         self.assertEqual(browser.targetfilepath, expected_filepath)
         self.assertEqual(browser.targetfilepaths, [expected_filepath,])
@@ -94,9 +96,8 @@ class UI_FileBrowser_Test(TestCase):
         button.click()
         dialog.redraw()
         time.sleep(self.time_between_emits)
-        self.assertEqual(browser.targetfile, u'')
-        self.assertEqual(browser.targetfiles, ['',])
-        self.assertEqual(browser.targetfolder, u'')
+        self.assertEqual(browser.targetfile, filename)
+        self.assertEqual(browser.targetfiles, [filename,])
 
         dialog.close()
         dialog = None
@@ -137,8 +138,8 @@ class UI_FileBrowser_Test(TestCase):
         browser.showDialog(test_mode='reject')
         dialog.redraw()
         time.sleep(self.time_between_emits)
-        self.assertEqual(browser.targetfile, u'')
-        self.assertEqual(browser.targetfolder, u'')
+        self.assertEqual(browser.targetfile, u'savename.py')
+        self.assertEqual(browser.targetfolder.lower(),  basepath.lower())
 
         dialog.close()
         dialog = None
@@ -176,7 +177,7 @@ class UI_FileBrowser_Test(TestCase):
         browser.showDialog(test_mode='reject')
         dialog.redraw()
         time.sleep(self.time_between_emits)
-        self.assertEqual(browser.targetfolder, u'')
+        self.assertEqual(browser.targetfolder, u'{}'.format(basepath))
         self.assertEqual(browser.targetfile, u'')
 
         dialog.close()
@@ -244,7 +245,7 @@ class UI_FileBrowser_Test(TestCase):
         dialog.close()
         dialog = None
 
-        self.assertEqual(browser.targetfolder, basepath)
+        self.assertEqual(browser.targetfilepath, basepath)
         self.assertEqual(browser.targetfile, '')
 
     # -------------------------------------------------------------------------

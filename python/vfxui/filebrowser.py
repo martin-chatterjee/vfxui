@@ -18,6 +18,7 @@ class FileBrowser(QtWidgets.QWidget):
     """
 
     clicked = QtCore.Signal()
+    updated = QtCore.Signal()
 
     # -------------------------------------------------------------------------
     def __init__(self,
@@ -37,13 +38,13 @@ class FileBrowser(QtWidgets.QWidget):
         super(FileBrowser, self).__init__()
 
         self.__targetfolder = ''
-        self.__targetfile = ''
         self.__targetfiles = ['']
 
         # store settings
         self.mode = mode
         self.__multiselect = False
         self.multiselect = multiselect
+        self.__direct_edit = False
 
         self.test_mode = None
         self.test_delay = 1 # seconds
@@ -84,11 +85,13 @@ class FileBrowser(QtWidgets.QWidget):
 
         self.text = QtWidgets.QLineEdit()
         self.text.setEnabled(False)
-        if direct_edit and not self.multiselect:
-            self.text.setEnabled(True)
+        self.direct_edit = direct_edit
         self.text.setToolTip(self.dialog_caption)
         self.text.setText(self.targetfilepath)
+        self.text.last_value = self.targetfilepath
         self.text.editingFinished.connect(self.slot_text_editingFinished)
+        self.text.returnPressed.connect(self.slot_text_returnPressed)
+        self.text.suppress_callback = False
 
         self.button = QtWidgets.QPushButton(button_label)
         self.button.setMinimumWidth(100)
@@ -102,7 +105,8 @@ class FileBrowser(QtWidgets.QWidget):
         self.setLayout(self.layout)
 
         # connect button to slot
-        self.button.clicked.connect(self.slot_released)
+        self.button.released.connect(self.slot_released)
+
 
     # -------------------------------------------------------------------------
     @property
@@ -117,6 +121,20 @@ class FileBrowser(QtWidgets.QWidget):
                 self.__filebrowser.selectFile(self.selected_file)
 
         return self.__filebrowser
+
+    # -------------------------------------------------------------------------
+    @property
+    def direct_edit(self):
+        """
+        """
+        return self.__direct_edit
+
+    @direct_edit.setter
+    def direct_edit(self, value):
+        self.__direct_edit = False
+        if value is True and not self.multiselect:
+            self.__direct_edit = True
+        self.text.setEnabled(self.direct_edit)
 
     # -------------------------------------------------------------------------
     @property
@@ -144,7 +162,9 @@ class FileBrowser(QtWidgets.QWidget):
     def targetfile(self):
         """
         """
-        return self.__targetfile
+        if len(self.__targetfiles):
+            return self.__targetfiles[0]
+        return ''
 
     # -------------------------------------------------------------------------
     @property
@@ -171,6 +191,8 @@ class FileBrowser(QtWidgets.QWidget):
         filepaths = []
         for file in self.targetfiles:
             tfp = '%s/%s' % (self.targetfolder, file)
+            if tfp.endswith('/'):
+                tfp = tfp[:-1]
             filepaths.append(tfp)
         return filepaths
 
@@ -180,16 +202,8 @@ class FileBrowser(QtWidgets.QWidget):
         """
         path = ''
 
-        if not test_mode is None:
+        if test_mode:
             self.test_mode = test_mode
-
-        # if not self.test_mode is None:
-        #     t = QtCore.QTimer(None)
-        #     if self.test_mode == 'reject':
-        #         t.timeout.connect(self.filebrowser.reject)
-        #     elif self.test_mode == 'accept':
-        #         t.timeout.connect(self.filebrowser.accept)
-        #     t.start(2000)
 
         if self.targetfolder != '':
             self.filebrowser.setDirectory(self.targetfolder)
@@ -211,7 +225,7 @@ class FileBrowser(QtWidgets.QWidget):
 
         status = False
 
-        if self.test_mode is None: # pragma no cover
+        if not self.test_mode: # pragma no cover
             status = self.filebrowser.exec_()
         else:
             self.filebrowser.show()
@@ -224,28 +238,40 @@ class FileBrowser(QtWidgets.QWidget):
             status = self.filebrowser.result()
         if status:
             paths = self.filebrowser.selectedFiles()
-            # conform and process paths and names
-            conformed_paths = []
-            base_names = []
-            for path in paths:
-                path = path.replace('\\', '/').strip()
-                conformed_paths.append(path)
-                base_names.append(os.path.basename(path))
+            self.setPaths(paths)
 
-            if self.mode == 'folder':
+
+    # -------------------------------------------------------------------------
+    def setPath(self, path, emit_signal=True):
+        """
+        """
+        self.setPaths([path, ], emit_signal=emit_signal)
+
+    # -------------------------------------------------------------------------
+    def setPaths(self, paths, emit_signal=True):
+        """
+        """
+        conformed_paths = []
+        file_names = []
+        for path in paths:
+            path = path.replace('\\', '/').strip()
+            conformed_paths.append(path)
+            file_names.append(os.path.basename(path))
+
+        if self.mode == 'folder':
+            self.__targetfolder = conformed_paths[0]
+            self.__targetfiles = ['',]
+        else:
+            if os.path.isdir(conformed_paths[0]):
                 self.__targetfolder = conformed_paths[0]
-                self.__targetfile = ''
                 self.__targetfiles = ['',]
             else:
                 self.__targetfolder = os.path.dirname(conformed_paths[0])
-                self.__targetfile = base_names[0]
-                self.__targetfiles = base_names
-        else:
-            self.__targetfolder = ''
-            self.__targetfile = ''
-            self.__targetfiles = ['',]
+                self.__targetfiles = file_names
 
         self._updateText()
+        if emit_signal:
+            self.updated.emit()
 
     # -------------------------------------------------------------------------
     def _updateText(self):
@@ -261,7 +287,9 @@ class FileBrowser(QtWidgets.QWidget):
             else:
                 content = self.targetfilepath
 
+        self.text.suppress_callback = True
         self.text.setText(content)
+        self.text.suppress_callback = False
 
     # -------------------------------------------------------------------------
     def slot_released(self, **kwargs):
@@ -271,13 +299,24 @@ class FileBrowser(QtWidgets.QWidget):
         self.clicked.emit()
 
     # -------------------------------------------------------------------------
+    def slot_text_returnPressed(self, **kwargs):
+        # pass
+        self.button.setFocus(QtCore.Qt.TabFocusReason)
+
+    # -------------------------------------------------------------------------
     def slot_text_editingFinished(self, **kwargs):
         """
         """
+        if self.text.last_value == self.text.text():
+            return
+        if self.text.suppress_callback:
+            return
         path = self._sanitizePath(self.text.text())
-        self.text.setText(path)
-        self.__targetfolder = path
-        self.button.setFocus(QtCore.Qt.TabFocusReason)
+        self.setPath(path)
+        self.text.last_value = path
+        # self.text.setText(path)
+        # self.__targetfolder = path
+        # self.button.setFocus(QtCore.Qt.TabFocusReason)
 
     # -------------------------------------------------------------------------
     def _sanitizePath(self, path):
