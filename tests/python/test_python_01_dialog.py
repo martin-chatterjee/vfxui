@@ -224,10 +224,26 @@ class UI_Dialog_Test(TestCase):
         self.assertFalse(dialog.disable_return_escape)
         dialog = dlg.createDialog(title='Awesome Dialog', no_return_escape=True)
         self.assertTrue(dialog.disable_return_escape)
+
         dialog.disable_return_escape = False
         self.assertFalse(dialog.disable_return_escape)
+        self.assertFalse(dialog.disable_return)
+        self.assertFalse(dialog.disable_escape)
+
         dialog.disable_return_escape = True
         self.assertTrue(dialog.disable_return_escape)
+        self.assertTrue(dialog.disable_return)
+        self.assertTrue(dialog.disable_escape)
+
+        dialog.disable_return = False
+        self.assertFalse(dialog.disable_return_escape)
+        self.assertFalse(dialog.disable_return)
+        self.assertTrue(dialog.disable_escape)
+
+        dialog.disable_escape = False
+        self.assertFalse(dialog.disable_return_escape)
+        self.assertFalse(dialog.disable_return)
+        self.assertFalse(dialog.disable_escape)
 
         dialog = None
 

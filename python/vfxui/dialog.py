@@ -139,10 +139,19 @@ class Dialog(QtWidgets.QDialog):
             if kwargs['scrollable'] is True:
                 self.__scrollable = True
 
-        self.__disable_return_escape = False
+        self.__disable_return = False
+        self.__disable_escape = False
+
+        if 'no_return' in kwargs:
+            if kwargs['no_return'] == True:
+                self.__disable_return = True
+        if 'no_escape' in kwargs:
+            if kwargs['no_escape'] == True:
+                self.__disable_escape = True
         if 'no_return_escape' in kwargs:
             if kwargs['no_return_escape'] == True:
-                self.__disable_return_escape = True
+                self.__disable_return = True
+                self.__disable_escape = True
 
         self.__test_mode = False
         if 'test_mode' in kwargs:
@@ -320,15 +329,38 @@ class Dialog(QtWidgets.QDialog):
 
     # -------------------------------------------------------------------------
     @property
+    def disable_return(self):
+        return self.__disable_return
+    # -------------------------------------------------------------------------
+    @disable_return.setter
+    def disable_return(self, value):
+        if value is not True:
+            value = False
+        self.__disable_return = value
+
+    # -------------------------------------------------------------------------
+    @property
+    def disable_escape(self):
+        return self.__disable_escape
+    # -------------------------------------------------------------------------
+    @disable_escape.setter
+    def disable_escape(self, value):
+        if value is not True:
+            value = False
+        self.__disable_escape = value
+
+    # -------------------------------------------------------------------------
+    @property
     def disable_return_escape(self):
-        return self.__disable_return_escape
+        return (self.__disable_return and self.__disable_escape)
     # -------------------------------------------------------------------------
     @disable_return_escape.setter
     def disable_return_escape(self, value):
-        if value == True:
-            self.__disable_return_escape = True
-        else:
-            self.__disable_return_escape = False
+        if value is not True:
+            value = False
+        print('>>>> {}'.format(value))
+        self.__disable_return = value
+        self.__disable_escape = value
 
     # -------------------------------------------------------------------------
     @property
@@ -1614,9 +1646,9 @@ class Dialog(QtWidgets.QDialog):
         if (event.modifiers() & QtCore.Qt.ShiftModifier):
             self.shift = True
             pass # make silent
-        elif event.key() == QtCore.Qt.Key_Escape and self.disable_return_escape:
+        elif event.key() == QtCore.Qt.Key_Escape and self.disable_escape:
             self.escapePressed.emit()
-        elif event.key() == QtCore.Qt.Key_Return and self.disable_return_escape:
+        elif event.key() in [QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter] and self.disable_return:
             self.returnPressed.emit()
         else:
             super(Dialog, self).keyPressEvent(event)
