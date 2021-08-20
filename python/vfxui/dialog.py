@@ -2497,10 +2497,13 @@ class ListRow(Dialog):
         self._layout_main.setContentsMargins(0, 0, 0, 0)
         self._layout_main.setSpacing(0)
 
+        self._listbox = None
+
     # -------------------------------------------------------------------------
     @property
     def listbox(self):
-        return self.parent().parent().parent().parent()
+        return self._listbox
+
     # -------------------------------------------------------------------------
     @property
     def listrow(self):

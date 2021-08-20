@@ -570,6 +570,9 @@ class ListBox(QtWidgets.QWidget):
     def addItem(self, item):
         """
         """
+        if hasattr(item, 'is_list_row'):
+            item._listbox = self
+
         item = ListWidgetItem(value=item,
                               index=self.count(),
                               **self._kwargs)
