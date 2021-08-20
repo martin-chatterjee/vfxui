@@ -45,7 +45,7 @@ class Heading(QtWidgets.QWidget):
 
         self.label = QtWidgets.QLabel(label)
         self.label.setProperty('labelClass', '{}_label'.format(size))
-        self.label.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Preferred)
+        self.label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred)
 
         self.layout.addWidget(self.label)
 
