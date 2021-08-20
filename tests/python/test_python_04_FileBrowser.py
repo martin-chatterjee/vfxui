@@ -58,8 +58,8 @@ class UI_FileBrowser_Test(TestCase):
                                   width=400,
                                   height=100,
                                   fixed_size=False,
-                                  test_mode=False,
-                                  test_display_length=self.display_length)
+                                  test_mode=True,
+                                  test_display_length=None)
 
         dialog.addSpacer(30)
         browser = dialog.addFileBrowser(
@@ -110,8 +110,8 @@ class UI_FileBrowser_Test(TestCase):
                                   width=400,
                                   height=100,
                                   fixed_size=False,
-                                  test_mode=False,
-                                  test_display_length=self.display_length)
+                                  test_mode=True,
+                                  test_display_length=None)
 
         dialog.addSpacer(30)
         browser = dialog.addFileBrowser(
@@ -152,6 +152,7 @@ class UI_FileBrowser_Test(TestCase):
         dialog = dlg.createDialog(title='dialog title',
                                   width=500,
                                   height=100,
+                                  test_mode=True,
                                   fixed_size=False)
 
         dialog.addSpacer(30)
@@ -190,8 +191,8 @@ class UI_FileBrowser_Test(TestCase):
                                   width=800,
                                   height=100,
                                   fixed_size=False,
-                                  test_mode=False,
-                                  test_display_length=self.display_length)
+                                  test_mode=True,
+                                  test_display_length=None)
 
         dialog.addSpacer(30)
         browser = dialog.addFileBrowser(
@@ -215,8 +216,8 @@ class UI_FileBrowser_Test(TestCase):
                                   width=800,
                                   height=100,
                                   fixed_size=False,
-                                  test_mode=False,
-                                  test_display_length=self.display_length)
+                                  test_mode=True,
+                                  test_display_length=None)
 
         dialog.addSpacer(30)
         browser = dialog.addFileBrowser(
@@ -255,8 +256,8 @@ class UI_FileBrowser_Test(TestCase):
                                   width=800,
                                   height=100,
                                   fixed_size=False,
-                                  test_mode=False,
-                                  test_display_length=self.display_length)
+                                  test_mode=True,
+                                  test_display_length=None)
 
         dialog.addSpacer(30)
         browser = dialog.addFileBrowser(
@@ -301,8 +302,8 @@ class UI_FileBrowser_Test(TestCase):
                                   width=800,
                                   height=100,
                                   fixed_size=False,
-                                  test_mode=False,
-                                  test_display_length=self.display_length)
+                                  test_mode=True,
+                                  test_display_length=None)
 
         dialog.addSpacer(30)
         browser = dialog.addFileBrowser(

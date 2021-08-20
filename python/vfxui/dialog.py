@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2017-2020, Martin Chatterjee. All rights reserved.
 # Licensed under MIT License (--> LICENSE.txt)
@@ -152,7 +152,7 @@ class Dialog(QtWidgets.QDialog):
                 else:
                     self.test_mode = 'ok'
 
-        self.__test_display_length = 1000 # milliseconds
+        self.__test_display_length = None
         if 'test_display_length' in kwargs:
             tdl = kwargs['test_display_length']
             self.test_display_length = tdl
@@ -299,9 +299,12 @@ class Dialog(QtWidgets.QDialog):
     # -------------------------------------------------------------------------
     @test_display_length.setter
     def test_display_length(self, value):
-        with Guard():
-            safety = int(value)
-            self.__test_display_length = safety
+        if value is None:
+            self.__test_display_length = None
+        else:
+            with Guard():
+                safety = int(value)
+                self.__test_display_length = safety
 
     # -------------------------------------------------------------------------
     @property
@@ -1678,12 +1681,12 @@ class Dialog(QtWidgets.QDialog):
         if Dialog.app:
             self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
 
-        if Dialog.standalone:
+        if Dialog.standalone and not self.test_mode:
             return self.exec_()
 
         super(Dialog, self).show()
 
-        if self.test_mode:
+        if self.test_mode and self.test_display_length:
             QtCore.QTimer.singleShot(self.__test_display_length, self.close)
 
         self.redraw()
@@ -1800,7 +1803,7 @@ class Dialog(QtWidgets.QDialog):
             else:
                 btn = self._btn_modal_cancel
 
-            if btn is not None:
+            if btn is not None and self.test_display_length is not None:
                 t = QtCore.QTimer(None)
                 t.setSingleShot(True)
                 t.timeout.connect(btn.animateClick)

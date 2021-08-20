@@ -20,7 +20,7 @@ from complexDialog import ComplexDialog
 from vfxtest import TestCase, mock
 
 # -----------------------------------------------------------------------------
-class FloatingMessage_Test(TestCase):
+class Heading_Test(TestCase):
     """
     """
 
@@ -30,7 +30,7 @@ class FloatingMessage_Test(TestCase):
 
         basepath = os.path.dirname(__file__).replace('\\', '/')
 
-        cls.display_length = 100
+        cls.test_display_length = 1000
         cls.time_between_emits = 0.2
         cls.delay = 20
 
@@ -47,52 +47,16 @@ class FloatingMessage_Test(TestCase):
         pass
 
     # -------------------------------------------------------------------------
-    def test01_dialog_with_floating_message(self):
+    def test01_heading(self):
 
         dlg = createDialog(width=400,
                            height=800,
                            test_mode='ok',
-                           test_display_length=None)
+                           test_display_length=self.test_display_length)
 
-        fm = dlg.createFloatingMessage()
-        dlg.show()
-        dlg.redraw()
-        time.sleep(self.time_between_emits)
-        fm.show('Foo')
-        dlg.redraw()
-        time.sleep(self.time_between_emits)
-        dlg.move(dlg.geometry().x() + 100, dlg.geometry().y())
-        fm.show('Bar')
-        dlg.redraw()
-        time.sleep(self.time_between_emits)
-        dlg.resize(600, 200)
-        fm.show('Really long text')
-        dlg.redraw()
-        time.sleep(self.time_between_emits)
-        fm.show('x')
-        dlg.redraw()
-        time.sleep(self.time_between_emits)
-        fm.hide()
+        h1 = dlg.addHeading(label='My Heading')
+        h3 = dlg.addHeading(label='subhead', size='h3', indent=50)
+        defaults_to_h2 = dlg.addHeading(label='defaults_to_h2', size='crap')
 
-        dlg.close()
-        dlg = None
+        dlg.showModal()
 
-
-    # -------------------------------------------------------------------------
-    def test02_dialog_with_floating_message_and_top(self):
-
-        dlg = createDialog(width=400,
-                           height=800,
-                           test_mode='ok',
-                           test_display_length=None)
-
-        fm = dlg.createFloatingMessage()
-        fm.top = 10.0
-        dlg.show()
-        dlg.redraw()
-        time.sleep(self.time_between_emits)
-        fm.show('Foo')
-        dlg.redraw()
-
-        dlg.close()
-        dlg = None

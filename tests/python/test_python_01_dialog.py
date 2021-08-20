@@ -121,12 +121,11 @@ class UI_Dialog_Test(TestCase):
                                   width=400,
                                   height=100,
                                   fixed_size=False,
-                                  test_mode=False,
-                                  test_display_length=self.display_length)
+                                  test_mode=True)
         # dialog.setWorkingDir(__file__)
         dialog.addSpacer(30)
-        img = dialog.addImage(image_path='%s/ActionsSubHead.png' % basepath,
-                        image_path_hi='%s/ActionsSubHead_HI.png' % basepath,
+        img = dialog.addImage(image_path='%s/green.png' % basepath,
+                        image_path_hi='%s/red.png' % basepath,
                         width=200,
                         height=50)
         img_id = dialog.getWidgetId(img)
@@ -139,7 +138,6 @@ class UI_Dialog_Test(TestCase):
         image = dialog.getWidget(img_id)
 
         dialog.show()
-
         QtTest.QTest.mouseMove(image,
                                pos=QtCore.QPoint(10,10),
                                delay=self.display_length)
@@ -151,11 +149,12 @@ class UI_Dialog_Test(TestCase):
                                 pos=QtCore.QPoint(10,10),
                                 delay=self.display_length)
 
-        img.swapImage(image_path='%s/ActionsSubHead_HI.png' % basepath)
+        img.swapImage(image_path='%s/red.png' % basepath)
 
         time.sleep(self.time_between_emits)
         dialog.close()
         dialog = None
+
 
     # -------------------------------------------------------------------------
     def test07_createSimpleDialog(self):
@@ -257,7 +256,7 @@ class UI_Dialog_Test(TestCase):
                                   test_mode=False,
                                   test_display_length='invalid')
 
-        self.assertEqual(dialog.test_display_length, 1000)
+        self.assertEqual(dialog.test_display_length, None)
 
         dialog = None
 
@@ -275,7 +274,7 @@ class UI_Dialog_Test(TestCase):
         self.assertTrue(status)
         self.assertEqual(dialog.last_view_modal, True)
 
-        dialog.test_mode = False
+        dialog.test_display_length = None
         dialog.show()
         time.sleep(self.time_between_emits)
         dialog.redraw()
@@ -360,7 +359,7 @@ class UI_Dialog_Test(TestCase):
                                   test_display_length=self.display_length)
 
         ret_val = dialog.showModal()
-        dialog.test_mode = False
+        dialog.test_display_length = None
         dialog.show()
         time.sleep(self.time_between_emits)
         dialog.show()
@@ -401,7 +400,7 @@ class UI_Dialog_Test(TestCase):
     # -------------------------------------------------------------------------
     def test18_DialogBase_keyPressedEvent(self):
 
-        dialog = dlg.createDialog()
+        dialog = dlg.createDialog(test_mode=True)
         dialog.disable_return_escape = True
 
         dialog.show()
@@ -441,7 +440,7 @@ class UI_Dialog_Test(TestCase):
         ret_val = dialog.showModal()
         self.assertTrue(ret_val)
 
-        dialog.test_mode = False
+        dialog.test_display_length = None
         dialog.show()
 
         time.sleep(self.time_between_emits)
@@ -496,7 +495,6 @@ class UI_Dialog_Test(TestCase):
 
         dialog.close()
         dialog = None
-
 
     # -------------------------------------------------------------------------
     def test20_createDialog_ownModalButtons(self):
@@ -896,7 +894,7 @@ class UI_Dialog_Test(TestCase):
     # -------------------------------------------------------------------------
     def test40_multiline_TextBox_placeholder(self):
 
-        dialog = createDialog(width=400, height=300)
+        dialog = createDialog(width=400, height=300, test_mode=True)
         mltb = dialog.addTextBox(multiline=True, placeholder='placeholder')
         tb = dialog.addTextBox(multiline=False)
         dialog.setFocus(tb)
@@ -919,7 +917,7 @@ class UI_Dialog_Test(TestCase):
 
         class TestDialog(Dialog):
             def initialize(self):
-                pass
+                self.test_mode = True
             def defineLayout(self):
                 self.text = self.addTextBox(multiline=False)
                 self.addSpacer(50)
@@ -963,7 +961,7 @@ class UI_Dialog_Test(TestCase):
     # -------------------------------------------------------------------------
     def test43_multiline_TextBox_leave_on_tab(self):
 
-        dialog = createDialog(width=400, height=300)
+        dialog = createDialog(width=400, height=300, test_mode=True)
         mltb = dialog.addTextBox(multiline=True, leave_on_tab=True)
         dialog.setFocus(mltb)
         dialog.show()
@@ -974,7 +972,7 @@ class UI_Dialog_Test(TestCase):
         dialog.close()
         dialog = None
 
-        dialog = createDialog(width=400, height=300)
+        dialog = createDialog(width=400, height=300, test_mode=True)
         mltb = dialog.addTextBox(multiline=True, leave_on_tab=False)
         dialog.setFocus(mltb)
         dialog.show()
@@ -988,7 +986,7 @@ class UI_Dialog_Test(TestCase):
     # -------------------------------------------------------------------------
     def test44_multiline_TextBox_leave_on_ctrl_enter(self):
 
-        dialog = createDialog(width=400, height=300)
+        dialog = createDialog(width=400, height=300, test_mode=True)
         mltb = dialog.addTextBox(multiline=True, leave_on_ctrl_enter=True)
         dialog.setFocus(mltb)
         dialog.show()
@@ -999,7 +997,7 @@ class UI_Dialog_Test(TestCase):
         dialog.close()
         dialog = None
 
-        dialog = createDialog(width=400, height=300)
+        dialog = createDialog(width=400, height=300, test_mode=True)
         mltb = dialog.addTextBox(multiline=True, leave_on_ctrl_enter=False)
         dialog.setFocus(mltb)
         dialog.show()
@@ -1009,7 +1007,6 @@ class UI_Dialog_Test(TestCase):
 
         dialog.close()
         dialog = None
-
 
     # -------------------------------------------------------------------------
     def test92_contextNuke(self):
@@ -1117,8 +1114,8 @@ class UI_Dialog_Test(TestCase):
                                               width=400,
                                               height=100,
                                               fixed_size=False,
-                                              test_mode=False,
-                                              test_display_length=self.display_length)
+                                              test_mode=True,
+                                              test_display_length=None)
 
                     dialog.addSpacer(30)
                     widget = dialog.addFileBrowser(

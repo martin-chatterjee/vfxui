@@ -51,8 +51,8 @@ class ListBox_Test(TestCase):
 
         dlg = createDialog(width=400,
                            height=800,
-                           # test_mode='ok',
-                           test_display_length=self.display_length)
+                           test_mode='ok',
+                           test_display_length=None)
 
         lb = dlg.addListBox(filtering=True,
                             multiselect=True,
@@ -144,8 +144,8 @@ class ListBox_Test(TestCase):
 
         dlg = createDialog(width=400,
                            height=800,
-                           # test_mode='ok',
-                           test_display_length=self.display_length)
+                           test_mode='ok',
+                           test_display_length=None)
 
         lb = dlg.addListBox(filtering=True,
                             multiselect=True,
@@ -168,8 +168,8 @@ class ListBox_Test(TestCase):
 
         dlg = createDialog(width=400,
                            height=800,
-                           # test_mode='ok',
-                           test_display_length=self.display_length)
+                           test_mode='ok',
+                           test_display_length=None)
 
         lb = dlg.addListBox(filtering=True,
                             multiselect=True,
@@ -192,8 +192,8 @@ class ListBox_Test(TestCase):
 
         dlg = createDialog(width=400,
                            height=800,
-                           # test_mode='ok',
-                           test_display_length=self.display_length)
+                           test_mode='ok',
+                           test_display_length=None)
 
         lb = dlg.addListBox(filtering=True,
                             multiselect=True,
@@ -223,7 +223,8 @@ class ListBox_Test(TestCase):
 
         dlg = createDialog(width=400,
                            height=800,
-                           test_display_length=self.display_length)
+                           test_mode=True,
+                           test_display_length=None)
 
 
         lb = dlg.addListBox(filtering=True,
@@ -257,7 +258,8 @@ class ListBox_Test(TestCase):
 
         dlg = createDialog(width=400,
                            height=800,
-                           test_display_length=self.display_length)
+                           test_mode=True,
+                           test_display_length=None)
 
 
         lb = dlg.addListBox(filtering=True,
@@ -288,7 +290,8 @@ class ListBox_Test(TestCase):
 
         dlg = createDialog(width=400,
                            height=800,
-                           test_display_length=self.display_length)
+                           test_mode=True,
+                           test_display_length=None)
 
         initial_row = ListRow(value='FirstRow', tooltip='Yess')
 
@@ -335,7 +338,8 @@ class ListBox_Test(TestCase):
 
         dlg = createDialog(width=400,
                            height=800,
-                           test_display_length=self.display_length)
+                           test_mode=True,
+                           test_display_length=None)
 
 
         lb = dlg.addListBox(filtering=True,
@@ -372,7 +376,8 @@ class ListBox_Test(TestCase):
 
         dlg = createDialog(width=400,
                            height=800,
-                           test_display_length=self.display_length)
+                           test_mode=True,
+                           test_display_length=None)
 
 
         lb = dlg.addListBox(filtering=True,
@@ -422,7 +427,8 @@ class ListBox_Test(TestCase):
 
         dlg = createDialog(width=400,
                            height=800,
-                           test_display_length=self.display_length)
+                           test_mode=True,
+                           test_display_length=None)
 
 
         lb = dlg.addListBox(filtering=True,
