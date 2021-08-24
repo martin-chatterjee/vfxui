@@ -1,4 +1,4 @@
- # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2017-2020, Martin Chatterjee. All rights reserved.
 # Licensed under MIT License (--> LICENSE.txt)
@@ -358,7 +358,6 @@ class Dialog(QtWidgets.QDialog):
     def disable_return_escape(self, value):
         if value is not True:
             value = False
-        print('>>>> {}'.format(value))
         self.__disable_return = value
         self.__disable_escape = value
 
