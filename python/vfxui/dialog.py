@@ -416,7 +416,7 @@ class Dialog(QtWidgets.QDialog):
     # -------------------------------------------------------------------------
     @title.setter
     def title(self, value):
-        if isinstance(value, str) or isinstance(value, unicode):
+        if type(value).__name__ in ('str', 'unicode'):
             self.__title = ('%s' % value).strip()
             self.setWindowTitle(self.__title)
             self.redraw()
@@ -800,7 +800,7 @@ class Dialog(QtWidgets.QDialog):
             value of widget, or None
 
         """
-        if isinstance(widget, str) or isinstance(widget, unicode):
+        if type(widget).__name__ in ('str', 'unicode'):
             widget_id = self._conformName(widget)
             if widget_id in self._widgets.keys():
                 widget = self._widgets[widget_id]
