@@ -2472,18 +2472,18 @@ def createDialog(targetclass=None, parent=None, **kwargs):
             # try to re-use an existing QApplication
             if Dialog.app is None:
                 Dialog.app = QtWidgets.QApplication.instance()
-                if Dialog.app is not None:
-                    with Guard():
-                        import sgtk.platform
-                        engine = sgtk.platform.current_engine()
-                        if engine.instance_name == 'tk-desktop':
-                            # work around the bug in 'tk-desktop' that silently
-                            # swallows the first created dialog
-                            parent = engine._get_dialog_parent()
-                            if not parent:
-                                parent, _ = engine._create_dialog_with_widget('_',
-                                                                              engine,
-                                                                              QtWidgets.QWidget)
+            if Dialog.app is not None:
+                with Guard():
+                    import sgtk.platform
+                    engine = sgtk.platform.current_engine()
+                    if engine.instance_name == 'tk-desktop':
+                        # work around the bug in 'tk-desktop' that silently
+                        # swallows the first created dialog
+                        parent = engine._get_dialog_parent()
+                        if not parent:
+                            parent, _ = engine._create_dialog_with_widget('_',
+                                                                          engine,
+                                                                          QtWidgets.QWidget)
             # create our own QAppliction for all other cases
             # (right now these are Python and Cinema4D)
             if Dialog.app is None:
