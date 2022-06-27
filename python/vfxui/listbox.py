@@ -577,7 +577,7 @@ class ListBox(QtWidgets.QWidget):
                               index=self.count(),
                               **self._kwargs)
         item.visible = True
-        size_hint = QtCore.QSize(-1, self.row_height)
+        size_hint = QtCore.QSize(0, self.row_height)
         item.setSizeHint(size_hint)
 
         self.list.addItem(item)
