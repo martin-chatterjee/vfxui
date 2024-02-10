@@ -1,2 +1,3 @@
-# vfx-ui
-Rapid and easy creation of PySide based user interfaces that can be used easily inside multiple contexts (Python 2, Python 3, Maya, Nuke, Houdini, ...)
+<img title="vfxui logo" src="https://raw.githubusercontent.com/martin-chatterjee/vfxui/main/doc/images/logo.png">
+
+### Rapid creation of reusable PySide based user interfaces within a VFX environment.

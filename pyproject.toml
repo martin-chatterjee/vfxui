@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "vfxui"
+dynamic = ["version"]
+description = "Rapid creation of reusable PySide based user interfaces within a VFX environment."
+authors = [
+    {name = "Martin Chatterjee", email = "martin@chatterjee.de"},
+]
+license = {text = "MIT"}
+readme = "README.md"
+classifiers = [
+    "Intended Audience :: Developers",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Development Status :: 1 - Planning",
+]
+
+# Dependencies
+requires-python = ">= 3.7"
+dependencies = [
+]
+
+
+[tool.setuptools.packages.find]
+where = ["source"]
+include = ["vfxui"]
+namespaces = false
+
+
+[tool.setuptools.dynamic]
+version = {attr = "vfxui._version.__version__"}
+
+
+[tool.ruff]
+line-length = 88
+src = ["source"]
+
+
+[tool.ruff.flake8-quotes]
+inline-quotes = "double"
+
+
+[tool.black]
+line-length = 88
