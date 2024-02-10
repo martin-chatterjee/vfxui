@@ -51,4 +51,3 @@ inline-quotes = "double"
 
 [tool.black]
 line-length = 88
-
