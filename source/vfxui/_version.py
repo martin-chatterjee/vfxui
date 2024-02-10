@@ -3,4 +3,4 @@
 Package version definition.
 """
 
-__version__: str = "0.0.0.dev1"
+__version__: str = "0.0.0.dev2"
