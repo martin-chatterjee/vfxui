@@ -8,6 +8,8 @@ Try to import a binding in this order:
     - PySide2
     - PyQt5
 
+Redirect all attribute and submodule imports into `BINDING`.
+
 """
 import importlib
 import logging
@@ -15,6 +17,21 @@ import logging
 
 BINDING = None
 """Resolved binding"""
+
+
+def __getattr__(name):
+    """Redirect all unresolved attribute calls to `BINDING`.
+
+    First try to return an actual attribute. If that does not exist, then
+    try to import and return a submodule.
+
+    """
+    if BINDING:
+        try:
+            return getattr(BINDING, name)
+        except AttributeError:
+            return importlib.import_module(f"{BINDING.__name__}.{name}")
+    raise AttributeError(f"Module '{__name__}' has no attribute '{name}'")
 
 
 def import_binding():
