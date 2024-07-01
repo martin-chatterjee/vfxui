@@ -1,3 +1,6 @@
+# Copyright (c) 2019-2024, Martin Chatterjee. All rights reserved.
+# Licensed under the terms of the MIT license. (--> LICENSE.txt)
+
 """@package vfxui.binding
 
 Import a valid binding and store it in `BINDING`.
