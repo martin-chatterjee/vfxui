@@ -8,7 +8,7 @@ name = "vfxui"
 dynamic = ["version"]
 description = "Rapid creation of reusable PySide based user interfaces within a VFX environment."
 authors = [{ name = "Martin Chatterjee", email = "martin@chatterjee.de" }]
-license = {file = "LICENSE.txt"}
+license = { file = "LICENSE.txt" }
 readme = "README.md"
 classifiers = [
     "Intended Audience :: Developers",
@@ -57,3 +57,21 @@ inline-quotes = "double"
 
 [tool.black]
 line-length = 88
+
+
+[tool.pytest.ini_options]
+testpaths = ["test/unit",]
+addopts = "--cov --cov-report=term --cov-report=html"
+
+
+[tool.coverage.run]
+branch = true
+source = ["source/"]
+
+
+[tool.coverage.report]
+show_missing = true
+
+
+[tool.coverage.html]
+directory = "doc/test-coverage"
