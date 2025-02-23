@@ -7,10 +7,8 @@ build-backend = "setuptools.build_meta"
 name = "vfxui"
 dynamic = ["version"]
 description = "Rapid creation of reusable PySide based user interfaces within a VFX environment."
-authors = [
-    {name = "Martin Chatterjee", email = "martin@chatterjee.de"},
-]
-license = {text = "MIT"}
+authors = [{ name = "Martin Chatterjee", email = "martin@chatterjee.de" }]
+license = { file = "LICENSE.txt" }
 readme = "README.md"
 classifiers = [
     "Intended Audience :: Developers",
@@ -21,14 +19,22 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: MIT License",
     "Development Status :: 1 - Planning",
 ]
 
 # Dependencies
 requires-python = ">= 3.7"
-dependencies = [
+dependencies = []
+
+[project.optional-dependencies]
+test = [
+    "pytest >= 7.4.4, < 8.0",
+    "pytest-mock >= 3.11.1, < 4.0",
+    "pytest-cov >= 4.1.0, < 5.0",
 ]
+dev = ["vfxui[test]"]
 
 
 [tool.setuptools.packages.find]
@@ -38,7 +44,7 @@ namespaces = false
 
 
 [tool.setuptools.dynamic]
-version = {attr = "vfxui._version.__version__"}
+version = { attr = "vfxui._version.__version__" }
 
 
 [tool.ruff]
@@ -52,3 +58,21 @@ inline-quotes = "double"
 
 [tool.black]
 line-length = 88
+
+
+[tool.pytest.ini_options]
+testpaths = ["test/unit",]
+addopts = "--cov --cov-report=term --cov-report=html"
+
+
+[tool.coverage.run]
+branch = true
+source = ["source/"]
+
+
+[tool.coverage.report]
+show_missing = true
+
+
+[tool.coverage.html]
+directory = "doc/test-coverage"
