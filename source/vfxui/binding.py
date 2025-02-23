@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2024, Martin Chatterjee. All rights reserved.
+# Copyright (c) 2019-2025, Martin Chatterjee. All rights reserved.
 # Licensed under the terms of the MIT license. (--> LICENSE.txt)
 
 """@package vfxui.binding
@@ -14,6 +14,7 @@ Try to import a binding in this order:
 Redirect all attribute and submodule imports into `BINDING`.
 
 """
+
 import importlib
 import logging
 
